@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Econyx.Application/Econyx.Application.csproj" />
+    <Project Path="src/Econyx.Core/Econyx.Core.csproj" />
+    <Project Path="src/Econyx.Dashboard/Econyx.Dashboard.csproj" />
+    <Project Path="src/Econyx.Domain/Econyx.Domain.csproj" />
+    <Project Path="src/Econyx.Infrastructure/Econyx.Infrastructure.csproj" />
+    <Project Path="src/Econyx.Worker/Econyx.Worker.csproj" />
+  </Folder>
+</Solution>

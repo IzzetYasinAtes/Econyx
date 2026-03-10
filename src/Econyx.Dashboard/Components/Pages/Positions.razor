@@ -1,0 +1,79 @@
+@page "/positions"
+@rendermode InteractiveServer
+@inject IMediator Mediator
+
+<PageTitle>Positions — Econyx</PageTitle>
+
+<div class="page-header">
+    <h2 class="page-title mono">OPEN POSITIONS</h2>
+    <button class="refresh-btn mono" @onclick="LoadPositions">REFRESH</button>
+</div>
+
+@if (_positions is null)
+{
+    <div class="loading mono text-muted">Loading...</div>
+}
+else if (_positions.Count == 0)
+{
+    <div class="empty-state mono text-muted">No open positions</div>
+}
+else
+{
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Market</th>
+                    <th>Side</th>
+                    <th>Entry</th>
+                    <th>Current</th>
+                    <th>Qty</th>
+                    <th>PnL</th>
+                    <th>Strategy</th>
+                    <th>Opened</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in _positions)
+                {
+                    <tr>
+                        <td class="col-question" title="@p.MarketQuestion">@Truncate(p.MarketQuestion, 60)</td>
+                        <td>
+                            <span class="side-badge @(p.Side == TradeSide.Yes ? "side-yes" : "side-no")">
+                                @p.Side
+                            </span>
+                        </td>
+                        <td class="mono">$@p.EntryPrice.Amount.ToString("F2")</td>
+                        <td class="mono">$@p.CurrentPrice.Amount.ToString("F2")</td>
+                        <td class="mono">@p.Quantity.ToString("F2")</td>
+                        <td class="mono @PnLClass(p.UnrealizedPnL.Amount)">
+                            @FormatPnL(p.UnrealizedPnL.Amount)
+                        </td>
+                        <td class="text-muted">@p.StrategyName</td>
+                        <td class="mono text-muted">@p.OpenedAt.ToString("MM/dd HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private IReadOnlyList<PositionDto>? _positions;
+
+    protected override async Task OnInitializedAsync() => await LoadPositions();
+
+    private async Task LoadPositions()
+    {
+        try { _positions = await Mediator.Send(new GetOpenPositionsQuery()); }
+        catch { _positions = []; }
+    }
+
+    private static string PnLClass(decimal v) => v >= 0 ? "text-green" : "text-red";
+
+    private static string FormatPnL(decimal v) =>
+        v >= 0 ? $"+${v:F2}" : $"-${Math.Abs(v):F2}";
+
+    private static string Truncate(string s, int max) =>
+        s.Length <= max ? s : string.Concat(s.AsSpan(0, max), "...");
+}

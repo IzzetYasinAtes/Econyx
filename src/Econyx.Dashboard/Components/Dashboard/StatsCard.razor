@@ -1,0 +1,18 @@
+
+<div class="stats-card">
+    <div class="stats-card-title">@Title</div>
+    <div class="stats-card-value" style="@ValueStyle">@Value</div>
+    @if (!string.IsNullOrEmpty(SubText))
+    {
+        <div class="stats-card-sub">@SubText</div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter, EditorRequired] public string Value { get; set; } = "";
+    [Parameter] public string? SubText { get; set; }
+    [Parameter] public string? ValueColor { get; set; }
+
+    private string ValueStyle => string.IsNullOrEmpty(ValueColor) ? "" : $"color: {ValueColor}";
+}

@@ -1,0 +1,169 @@
+@page "/"
+@rendermode InteractiveServer
+@inject IMediator Mediator
+@implements IDisposable
+
+<PageTitle>Econyx Dashboard</PageTitle>
+
+@if (_stats is null)
+{
+    <div class="loading">Loading...</div>
+}
+else
+{
+    <div class="dashboard">
+
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <span class="agent-title mono">ECONYX AGENT</span>
+                <span class="agent-mode mono text-muted">//</span>
+                <span class="agent-mode mono text-yellow">SURVIVAL MODE</span>
+                <span class="status-dot"></span>
+                <span class="status-text mono text-green">ALIVE</span>
+            </div>
+            <div class="top-bar-right mono">
+                <span class="text-muted">UPTIME</span>
+                <span>@FormatUptime(_stats.Uptime)</span>
+                <span class="text-muted" style="margin-left: 1rem;">CYCLE</span>
+                <span>#@_stats.CycleCount</span>
+            </div>
+        </div>
+
+        <!-- METRIC CARDS -->
+        <div class="metric-cards">
+            <StatsCard Title="CURRENT BALANCE"
+                       Value="@FormatMoney(_stats.Balance)"
+                       SubText="@($"initial: ${_initialBalance:F2}")" />
+            <StatsCard Title="TOTAL PnL"
+                       Value="@FormatPnL(_stats.TotalPnL)"
+                       ValueColor="@PnLColor(_stats.TotalPnL.Amount)"
+                       SubText="@FormatPnLPercent()" />
+            <StatsCard Title="API COSTS PAID"
+                       Value="@FormatMoney(_stats.ApiCosts)"
+                       SubText="self-funded inference" />
+            <StatsCard Title="WIN RATE"
+                       Value="@($"{_stats.WinRate:F1}%")"
+                       ValueColor="@(_stats.WinRate >= 50 ? "var(--green)" : "var(--red)")"
+                       SubText="@WinLossText()" />
+        </div>
+
+        <!-- MAIN AREA -->
+        <div class="main-area">
+            <div class="main-left">
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <span class="mono">BALANCE HISTORY (LOG SCALE)</span>
+                        <span class="mono text-muted">@FormatUptime(_stats.Uptime) / 48H</span>
+                    </div>
+                    <div class="chart-placeholder">
+                        <span class="text-muted mono">Chart will render with live data</span>
+                    </div>
+                </div>
+            </div>
+            <div class="main-right">
+                <ActivityLog Entries="_activityLog" />
+            </div>
+        </div>
+
+        <!-- BOTTOM BAR -->
+        <div class="bottom-bar mono">
+            <div class="bottom-stat">
+                <span class="text-muted">Daily API Cost</span>
+                <span>$@_stats.DailyApiCost.ToString("F2")</span>
+            </div>
+            <div class="bottom-stat">
+                <span class="text-muted">Runway</span>
+                <span>@_stats.RunwayDays days</span>
+            </div>
+            <div class="bottom-stat">
+                <span class="text-muted">Trades</span>
+                <span>@_stats.TotalTrades</span>
+            </div>
+            <div class="bottom-stat">
+                <span class="text-muted">Markets Scanned</span>
+                <span>@_stats.MarketsScanned</span>
+            </div>
+            <div class="bottom-stat">
+                <span class="text-muted">Open Positions</span>
+                <span>@_stats.OpenPositions</span>
+            </div>
+            <div class="bottom-stat">
+                <span class="text-muted">Best Trade</span>
+                <span class="text-green">@FormatMoney(_stats.BestTrade)</span>
+            </div>
+            <div class="bottom-stat">
+                <span class="text-muted">Worst Trade</span>
+                <span class="text-red">@FormatMoney(_stats.WorstTrade)</span>
+            </div>
+            <div class="bottom-stat">
+                <span class="text-muted">Sharpe Ratio</span>
+                <span>@_stats.SharpeRatio.ToString("F2")</span>
+            </div>
+            <div class="bottom-stat">
+                <span class="text-muted">Avg Edge</span>
+                <span>@($"{_stats.AvgEdge:F1}%")</span>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private DashboardStatsDto? _stats;
+    private Timer? _timer;
+    private decimal _initialBalance = 50m;
+    private List<ActivityLogEntry> _activityLog = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStats();
+        _timer = new Timer(async _ => await RefreshStats(), null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+    }
+
+    private async Task LoadStats()
+    {
+        try
+        {
+            _stats = await Mediator.Send(new GetDashboardStatsQuery());
+            _activityLog.Add(new ActivityLogEntry(DateTime.Now, "Dashboard data loaded", "#3fb950"));
+        }
+        catch (Exception ex)
+        {
+            _activityLog.Add(new ActivityLogEntry(DateTime.Now, $"Error: {ex.Message}", "#f85149"));
+        }
+    }
+
+    private async Task RefreshStats()
+    {
+        await LoadStats();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private static string FormatMoney(Money m) => $"${m.Amount:F2}";
+
+    private static string FormatPnL(Money pnl) =>
+        pnl.Amount >= 0 ? $"+${pnl.Amount:F2}" : $"-${Math.Abs(pnl.Amount):F2}";
+
+    private string FormatPnLPercent()
+    {
+        if (_stats is null || _initialBalance == 0) return "";
+        var pct = (_stats.TotalPnL.Amount / _initialBalance) * 100;
+        return pct >= 0 ? $"+{pct:F1}%" : $"{pct:F1}%";
+    }
+
+    private static string PnLColor(decimal amount) =>
+        amount >= 0 ? "var(--green)" : "var(--red)";
+
+    private string WinLossText()
+    {
+        if (_stats is null) return "";
+        var wins = (int)(_stats.TotalTrades * _stats.WinRate / 100);
+        var losses = _stats.TotalTrades - wins;
+        return $"{wins}W / {losses}L";
+    }
+
+    private static string FormatUptime(TimeSpan ts) =>
+        ts.TotalHours >= 1 ? $"{ts.TotalHours:F1}H" : $"{ts.TotalMinutes:F0}M";
+
+    public void Dispose() => _timer?.Dispose();
+}

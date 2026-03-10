@@ -1,0 +1,20 @@
+@inherits LayoutComponentBase
+
+<div class="econyx-root">
+    <nav class="econyx-nav">
+        <NavLink class="nav-item" href="" Match="NavLinkMatch.All">Dashboard</NavLink>
+        <NavLink class="nav-item" href="positions">Positions</NavLink>
+        <NavLink class="nav-item" href="trades">Trades</NavLink>
+        <NavLink class="nav-item" href="settings">Settings</NavLink>
+    </nav>
+
+    <main class="econyx-main">
+        @Body
+    </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">&#x1f5d9;</span>
+</div>

@@ -1,0 +1,99 @@
+@page "/trades"
+@rendermode InteractiveServer
+@inject IMediator Mediator
+
+<PageTitle>Trades — Econyx</PageTitle>
+
+<div class="page-header">
+    <h2 class="page-title mono">TRADE HISTORY</h2>
+    <span class="text-muted mono" style="font-size: 0.75rem;">
+        @if (_history is not null)
+        {
+            @($"{_history.TotalCount} total trades")
+        }
+    </span>
+</div>
+
+@if (_history is null)
+{
+    <div class="loading mono text-muted">Loading...</div>
+}
+else if (_history.Items.Count == 0)
+{
+    <div class="empty-state mono text-muted">No trades yet</div>
+}
+else
+{
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Market</th>
+                    <th>Side</th>
+                    <th>Entry</th>
+                    <th>Exit</th>
+                    <th>Qty</th>
+                    <th>PnL</th>
+                    <th>Duration</th>
+                    <th>Strategy</th>
+                    <th>Closed</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in _history.Items)
+                {
+                    <tr>
+                        <td class="col-question" title="@t.MarketQuestion">@Truncate(t.MarketQuestion, 50)</td>
+                        <td>
+                            <span class="side-badge @(t.Side == TradeSide.Yes ? "side-yes" : "side-no")">
+                                @t.Side
+                            </span>
+                        </td>
+                        <td class="mono">$@t.EntryPrice.Amount.ToString("F2")</td>
+                        <td class="mono">$@t.ExitPrice.Amount.ToString("F2")</td>
+                        <td class="mono">@t.Quantity.ToString("F2")</td>
+                        <td class="mono @PnLClass(t.PnL.Amount)">@FormatPnL(t.PnL.Amount)</td>
+                        <td class="mono text-muted">@FormatDuration(t.Duration)</td>
+                        <td class="text-muted">@t.StrategyName</td>
+                        <td class="mono text-muted">@t.ClosedAt.ToString("MM/dd HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (_totalPages > 1)
+    {
+        <div class="pagination mono">
+            <button class="page-btn" disabled="@(_page <= 1)" @onclick="PrevPage">&lt; PREV</button>
+            <span class="text-muted">@_page / @_totalPages</span>
+            <button class="page-btn" disabled="@(_page >= _totalPages)" @onclick="NextPage">NEXT &gt;</button>
+        </div>
+    }
+}
+
+@code {
+    private TradeHistoryDto? _history;
+    private int _page = 1;
+    private const int PageSize = 20;
+    private int _totalPages => _history is null ? 1 : Math.Max(1, (int)Math.Ceiling(_history.TotalCount / (double)PageSize));
+
+    protected override async Task OnInitializedAsync() => await LoadTrades();
+
+    private async Task LoadTrades()
+    {
+        try { _history = await Mediator.Send(new GetTradeHistoryQuery(PageSize, _page)); }
+        catch { _history = new TradeHistoryDto([], 0); }
+    }
+
+    private async Task PrevPage() { _page = Math.Max(1, _page - 1); await LoadTrades(); }
+    private async Task NextPage() { _page = Math.Min(_totalPages, _page + 1); await LoadTrades(); }
+
+    private static string PnLClass(decimal v) => v >= 0 ? "text-green" : "text-red";
+    private static string FormatPnL(decimal v) => v >= 0 ? $"+${v:F2}" : $"-${Math.Abs(v):F2}";
+    private static string Truncate(string s, int max) => s.Length <= max ? s : string.Concat(s.AsSpan(0, max), "...");
+
+    private static string FormatDuration(TimeSpan ts) => ts.TotalHours >= 1
+        ? $"{ts.TotalHours:F1}h"
+        : $"{ts.TotalMinutes:F0}m";
+}

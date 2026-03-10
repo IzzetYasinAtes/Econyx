@@ -1,0 +1,50 @@
+@implements IDisposable
+
+<div class="activity-log">
+    <div class="activity-log-header">
+        <span>ACTIVITY LOG</span>
+        <span class="text-muted">@Entries.Count events</span>
+    </div>
+    <div class="activity-log-body" @ref="_scrollContainer">
+        @if (Entries.Count == 0)
+        {
+            <div class="activity-log-empty text-muted">No events yet...</div>
+        }
+        else
+        {
+            @foreach (var entry in Entries)
+            {
+                <div class="activity-log-entry">
+                    <span class="activity-log-time mono">@entry.Timestamp.ToString("HH:mm:ss")</span>
+                    <span style="color: @entry.Color">@entry.Message</span>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<ActivityLogEntry> Entries { get; set; } = [];
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    private ElementReference _scrollContainer;
+    private int _lastCount;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Entries.Count != _lastCount)
+        {
+            _lastCount = Entries.Count;
+            try
+            {
+                await JS.InvokeVoidAsync("eval",
+                    $"document.querySelector('.activity-log-body')?.scrollTo(0, 999999)");
+            }
+            catch (JSDisconnectedException) { }
+        }
+    }
+
+    public void Dispose() { }
+}

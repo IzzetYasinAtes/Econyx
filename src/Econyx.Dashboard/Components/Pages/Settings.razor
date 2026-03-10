@@ -1,0 +1,82 @@
+@page "/settings"
+@rendermode InteractiveServer
+@using Microsoft.Extensions.Options
+@inject IOptions<TradingOptions> TradingOpts
+@inject IOptions<AiOptions> AiOpts
+@inject IOptions<PlatformOptions> PlatformOpts
+
+<PageTitle>Settings — Econyx</PageTitle>
+
+<div class="page-header">
+    <h2 class="page-title mono">CONFIGURATION</h2>
+    <span class="text-muted mono" style="font-size: 0.7rem;">READ-ONLY</span>
+</div>
+
+<div class="settings-grid">
+
+    <!-- Trading -->
+    <div class="settings-section">
+        <div class="section-header">
+            <span class="section-dot" style="background: var(--green);"></span>
+            TRADING
+        </div>
+        <div class="settings-list">
+            <SettingRow Label="Mode" Value="@_trading.Mode.ToString()"
+                        ValueColor="@(_trading.Mode == TradingMode.Paper ? "var(--yellow)" : "var(--green)")" />
+            <SettingRow Label="Initial Balance" Value="@($"${_trading.InitialBalance:F2}")" />
+            <SettingRow Label="Scan Interval" Value="@($"{_trading.ScanIntervalMinutes} min")" />
+            <SettingRow Label="Max Open Positions" Value="@_trading.MaxOpenPositions.ToString()" />
+            <SettingRow Label="Max Position Size" Value="@($"{_trading.MaxPositionSizePercent}%")" />
+            <SettingRow Label="Min Edge Threshold" Value="@($"{_trading.MinEdgeThreshold:P0}")" />
+            <SettingRow Label="Min Volume" Value="@($"${_trading.MinVolumeUsd:N0}")" />
+            <SettingRow Label="Max Spread" Value="@($"{_trading.MaxSpreadCents}¢")" />
+            <SettingRow Label="Stop Loss" Value="@($"{_trading.StopLossPercent}%")" />
+            <SettingRow Label="Take Profit" Value="@($"{_trading.TakeProfitPercent}%")" />
+            <SettingRow Label="Survival Threshold" Value="@($"${_trading.SurvivalModeThresholdUsd:F2}")" />
+        </div>
+    </div>
+
+    <!-- AI -->
+    <div class="settings-section">
+        <div class="section-header">
+            <span class="section-dot" style="background: var(--blue);"></span>
+            AI PROVIDER
+        </div>
+        <div class="settings-list">
+            <SettingRow Label="Provider" Value="@_ai.Provider" />
+            <SettingRow Label="Claude Model" Value="@_ai.Claude.Model" />
+            <SettingRow Label="Claude Max Tokens" Value="@_ai.Claude.MaxTokens.ToString("N0")" />
+            <SettingRow Label="OpenAI Model" Value="@_ai.OpenAI.Model" />
+            <SettingRow Label="Cache Duration" Value="@($"{_ai.CacheDurationMinutes} min")" />
+            <SettingRow Label="Max Concurrent" Value="@_ai.MaxConcurrentRequests.ToString()" />
+        </div>
+    </div>
+
+    <!-- Platform -->
+    <div class="settings-section">
+        <div class="section-header">
+            <span class="section-dot" style="background: var(--yellow);"></span>
+            PLATFORM
+        </div>
+        <div class="settings-list">
+            <SettingRow Label="CLOB URL" Value="@_platform.Polymarket.BaseUrl" />
+            <SettingRow Label="Gamma URL" Value="@_platform.Polymarket.GammaBaseUrl" />
+            <SettingRow Label="Chain ID" Value="@_platform.Polymarket.ChainId.ToString()" />
+            <SettingRow Label="Signature Type" Value="@_platform.Polymarket.SignatureType.ToString()" />
+        </div>
+    </div>
+
+</div>
+
+@code {
+    private TradingOptions _trading = new();
+    private AiOptions _ai = new();
+    private PlatformOptions _platform = new();
+
+    protected override void OnInitialized()
+    {
+        _trading = TradingOpts.Value;
+        _ai = AiOpts.Value;
+        _platform = PlatformOpts.Value;
+    }
+}
