@@ -4,6 +4,7 @@ using Econyx.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Econyx.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(EconyxDbContext))]
-    partial class EconyxDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260310224330_AddAiModelConfiguration")]
+    partial class AddAiModelConfiguration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,43 +76,6 @@ namespace Econyx.Infrastructure.Persistence.Migrations
                     b.HasIndex("Provider", "ModelId");
 
                     b.ToTable("AiModelConfigurations", (string)null);
-                });
-
-            modelBuilder.Entity("Econyx.Domain.Entities.ApiKeyConfiguration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EncryptedKey")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<bool>("IsConfigured")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MaskedDisplay")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Provider")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Provider")
-                        .IsUnique();
-
-                    b.ToTable("ApiKeyConfigurations", (string)null);
                 });
 
             modelBuilder.Entity("Econyx.Domain.Entities.BalanceSnapshot", b =>

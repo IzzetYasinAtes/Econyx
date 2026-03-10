@@ -74,7 +74,7 @@ else
             </div>
             <div class="bottom-stat">
                 <span class="text-muted">Runway</span>
-                <span>@_stats.RunwayDays days</span>
+                <span>@(_stats.RunwayDays >= 0 ? $"{_stats.RunwayDays} days" : "∞")</span>
             </div>
             <div class="bottom-stat">
                 <span class="text-muted">Trades</span>

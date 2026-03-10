@@ -8,14 +8,14 @@ using MediatR;
 public sealed class GetMarketAnalysisHandler : IRequestHandler<GetMarketAnalysisQuery, MarketAnalysisDto?>
 {
     private readonly IMarketRepository _marketRepository;
-    private readonly IAiAnalysisService _aiService;
+    private readonly IAiProviderFactory _providerFactory;
 
     public GetMarketAnalysisHandler(
         IMarketRepository marketRepository,
-        IAiAnalysisService aiService)
+        IAiProviderFactory providerFactory)
     {
         _marketRepository = marketRepository;
-        _aiService = aiService;
+        _providerFactory = providerFactory;
     }
 
     public async Task<MarketAnalysisDto?> Handle(GetMarketAnalysisQuery request, CancellationToken cancellationToken)
@@ -36,7 +36,8 @@ public sealed class GetMarketAnalysisHandler : IRequestHandler<GetMarketAnalysis
         FairValueResult? aiResult = null;
         try
         {
-            aiResult = await _aiService.AnalyzeMarketAsync(analysisRequest, cancellationToken);
+            var aiService = await _providerFactory.GetProviderAsync(cancellationToken);
+            aiResult = await aiService.AnalyzeMarketAsync(analysisRequest, cancellationToken);
         }
         catch
         {

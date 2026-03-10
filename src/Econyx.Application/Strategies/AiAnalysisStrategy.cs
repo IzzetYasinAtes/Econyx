@@ -9,12 +9,12 @@ using Microsoft.Extensions.Options;
 
 public sealed class AiAnalysisStrategy : IStrategy
 {
-    private readonly IAiAnalysisService _aiService;
+    private readonly IAiProviderFactory _providerFactory;
     private readonly TradingOptions _options;
 
-    public AiAnalysisStrategy(IAiAnalysisService aiService, IOptions<TradingOptions> options)
+    public AiAnalysisStrategy(IAiProviderFactory providerFactory, IOptions<TradingOptions> options)
     {
-        _aiService = aiService;
+        _providerFactory = providerFactory;
         _options = options.Value;
     }
 
@@ -25,6 +25,8 @@ public sealed class AiAnalysisStrategy : IStrategy
         CancellationToken ct = default)
     {
         var signals = new List<StrategySignal>();
+
+        var aiService = await _providerFactory.GetProviderAsync(ct);
 
         foreach (var market in markets)
         {
@@ -41,7 +43,7 @@ public sealed class AiAnalysisStrategy : IStrategy
                 market.Outcomes.Select(o => o.Price.Value).ToList(),
                 market.VolumeUsd);
 
-            var result = await _aiService.AnalyzeMarketAsync(request, ct);
+            var result = await aiService.AnalyzeMarketAsync(request, ct);
 
             foreach (var outcome in result.Outcomes)
             {

@@ -1,68 +1,230 @@
 @page "/settings"
 @rendermode InteractiveServer
 @using Microsoft.Extensions.Options
+@using Econyx.Application.Configuration
+@using Econyx.Application.Ports
+@using Econyx.Application.Commands.UpdateAiModel
+@using Econyx.Application.Queries.GetActiveAiConfig
+@using Econyx.Application.Queries.GetAvailableModels
+@using Econyx.Application.Commands.SaveApiKey
+@using Econyx.Application.Queries.GetApiKeyStatus
+@using Econyx.Domain.Enums
+@using MediatR
 @inject IOptions<TradingOptions> TradingOpts
 @inject IOptions<AiOptions> AiOpts
 @inject IOptions<PlatformOptions> PlatformOpts
+@inject IMediator Mediator
 
 <PageTitle>Settings — Econyx</PageTitle>
 
 <div class="page-header">
     <h2 class="page-title mono">CONFIGURATION</h2>
-    <span class="text-muted mono" style="font-size: 0.7rem;">READ-ONLY</span>
+    @if (_saving || _keySaving)
+    {
+        <span class="status-badge saving mono">SAVING...</span>
+    }
+    else if (_saveSuccess || _keySaveSuccess)
+    {
+        <span class="status-badge success mono">SAVED</span>
+    }
 </div>
 
-<div class="settings-grid">
+<div class="settings-layout">
 
-    <!-- Trading -->
-    <div class="settings-section">
-        <div class="section-header">
-            <span class="section-dot" style="background: var(--green);"></span>
-            TRADING
+    <!-- COL 1: AI Model Selection -->
+    <div class="col-model">
+
+        <!-- Active Model Compact -->
+        <div class="settings-section">
+            <div class="section-header">
+                <span class="section-dot dot-blue"></span>
+                ACTIVE MODEL
+            </div>
+            <div class="active-compact">
+                @if (_activeConfig is not null)
+                {
+                    <span class="active-name">@_activeConfig.DisplayName</span>
+                    <span class="badge provider-badge">@_activeConfig.Provider</span>
+                    @if (_activeConfig.PromptPricePer1M > 0)
+                    {
+                        <span class="text-muted mono text-xs">$@_activeConfig.PromptPricePer1M.ToString("F2")/$@_activeConfig.CompletionPricePer1M.ToString("F2")</span>
+                    }
+                }
+                else
+                {
+                    <span class="active-name text-muted">@_ai.OpenRouter.DefaultModel</span>
+                    <span class="badge provider-badge">@_ai.Provider</span>
+                }
+            </div>
         </div>
-        <div class="settings-list">
-            <SettingRow Label="Mode" Value="@_trading.Mode.ToString()"
-                        ValueColor="@(_trading.Mode == TradingMode.Paper ? "var(--yellow)" : "var(--green)")" />
-            <SettingRow Label="Initial Balance" Value="@($"${_trading.InitialBalance:F2}")" />
-            <SettingRow Label="Scan Interval" Value="@($"{_trading.ScanIntervalMinutes} min")" />
-            <SettingRow Label="Max Open Positions" Value="@_trading.MaxOpenPositions.ToString()" />
-            <SettingRow Label="Max Position Size" Value="@($"{_trading.MaxPositionSizePercent}%")" />
-            <SettingRow Label="Min Edge Threshold" Value="@($"{_trading.MinEdgeThreshold:P0}")" />
-            <SettingRow Label="Min Volume" Value="@($"${_trading.MinVolumeUsd:N0}")" />
-            <SettingRow Label="Max Spread" Value="@($"{_trading.MaxSpreadCents}¢")" />
-            <SettingRow Label="Stop Loss" Value="@($"{_trading.StopLossPercent}%")" />
-            <SettingRow Label="Take Profit" Value="@($"{_trading.TakeProfitPercent}%")" />
-            <SettingRow Label="Survival Threshold" Value="@($"${_trading.SurvivalModeThresholdUsd:F2}")" />
+
+        <!-- Provider Tabs + Model List -->
+        <div class="settings-section flex-fill">
+            <div class="section-header">
+                <span class="section-dot dot-blue"></span>
+                MODEL SEC
+            </div>
+            <div class="model-panel">
+                <div class="provider-tabs">
+                    @foreach (var provider in Enum.GetValues<AiProviderType>())
+                    {
+                        <button class="provider-tab @(provider == _selectedProvider ? "active" : "")"
+                                @onclick="() => OnProviderChanged(provider)">
+                            @provider.ToString()
+                        </button>
+                    }
+                </div>
+
+                @if (_selectedProvider == AiProviderType.OpenRouter)
+                {
+                    <div class="search-wrapper">
+                        <input type="text" class="form-input" placeholder="Model ara..."
+                               @bind="_searchText" @bind:event="oninput" />
+                        @if (_loadingModels)
+                        {
+                            <span class="search-spinner"></span>
+                        }
+                    </div>
+                    <div class="model-list">
+                        @if (_filteredModels.Count == 0 && !_loadingModels)
+                        {
+                            <div class="model-empty text-muted">Model bulunamadi</div>
+                        }
+                        @foreach (var model in _filteredModels.Take(80))
+                        {
+                            <button class="model-item @(model.Id == _selectedModelId ? "selected" : "")"
+                                    @onclick="() => OnModelSelected(model)">
+                                <span class="mi-name">@model.Name</span>
+                                <span class="mi-meta">
+                                    @model.ContextLength.ToString("N0")
+                                    @if (model.PromptPricePer1M > 0)
+                                    {
+                                        <text> · $@model.PromptPricePer1M.ToString("F2")</text>
+                                    }
+                                    else
+                                    {
+                                        <text> · FREE</text>
+                                    }
+                                </span>
+                            </button>
+                        }
+                    </div>
+                }
+                else if (_selectedProvider == AiProviderType.Anthropic)
+                {
+                    <select class="form-select" @bind="_selectedModelId">
+                        <option value="claude-sonnet-4-20250514">Claude Sonnet 4</option>
+                        <option value="claude-4.6-opus-20250514">Claude Opus 4.6</option>
+                        <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+                        <option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku</option>
+                    </select>
+                }
+                else
+                {
+                    <select class="form-select" @bind="_selectedModelId">
+                        <option value="gpt-4o">GPT-4o</option>
+                        <option value="gpt-4o-mini">GPT-4o Mini</option>
+                        <option value="o3-mini">o3-mini</option>
+                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                    </select>
+                }
+
+                <!-- Max Tokens + Save inline -->
+                <div class="inline-row">
+                    <div class="inline-field">
+                        <label class="form-label mono">MAX TOKENS</label>
+                        <input type="number" class="form-input" @bind="_selectedMaxTokens" min="256" max="32768" step="256" />
+                    </div>
+                    <button class="btn-save" @onclick="SaveModelAsync"
+                            disabled="@(string.IsNullOrEmpty(_selectedModelId) || _saving)">
+                        @(_saving ? "..." : "Kaydet")
+                    </button>
+                </div>
+                @if (!string.IsNullOrEmpty(_saveError))
+                {
+                    <div class="save-error">@_saveError</div>
+                }
+            </div>
         </div>
     </div>
 
-    <!-- AI -->
-    <div class="settings-section">
-        <div class="section-header">
-            <span class="section-dot" style="background: var(--blue);"></span>
-            AI PROVIDER
-        </div>
-        <div class="settings-list">
-            <SettingRow Label="Provider" Value="@_ai.Provider" />
-            <SettingRow Label="Claude Model" Value="@_ai.Claude.Model" />
-            <SettingRow Label="Claude Max Tokens" Value="@_ai.Claude.MaxTokens.ToString("N0")" />
-            <SettingRow Label="OpenAI Model" Value="@_ai.OpenAI.Model" />
-            <SettingRow Label="Cache Duration" Value="@($"{_ai.CacheDurationMinutes} min")" />
-            <SettingRow Label="Max Concurrent" Value="@_ai.MaxConcurrentRequests.ToString()" />
+    <!-- COL 2: API Keys -->
+    <div class="col-keys">
+        <div class="settings-section">
+            <div class="section-header">
+                <span class="section-dot dot-red"></span>
+                API KEYS
+            </div>
+            <div class="keys-panel">
+                @foreach (var provider in Enum.GetValues<AiProviderType>())
+                {
+                    var status = _apiKeyStatuses.FirstOrDefault(s => s.Provider == provider);
+                    <div class="key-row">
+                        <div class="key-row-top">
+                            <span class="key-provider mono">@provider</span>
+                            @if (status?.IsConfigured == true)
+                            {
+                                <span class="badge key-ok">@status.MaskedKey</span>
+                            }
+                            else
+                            {
+                                <span class="badge key-miss">Yok</span>
+                            }
+                        </div>
+                        <div class="key-row-input">
+                            <input type="password" class="form-input"
+                                   placeholder="@GetKeyPlaceholder(provider)"
+                                   @bind="_apiKeyInputs[provider]" />
+                            <button class="btn-key"
+                                    @onclick="() => SaveApiKeyAsync(provider)"
+                                    disabled="@(string.IsNullOrWhiteSpace(GetKeyInput(provider)) || _keySaving)">
+                                Kaydet
+                            </button>
+                        </div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(_keySaveError))
+                {
+                    <div class="save-error">@_keySaveError</div>
+                }
+            </div>
         </div>
     </div>
 
-    <!-- Platform -->
-    <div class="settings-section">
-        <div class="section-header">
-            <span class="section-dot" style="background: var(--yellow);"></span>
-            PLATFORM
+    <!-- COL 3: Trading + Platform stacked -->
+    <div class="col-config">
+        <div class="settings-section">
+            <div class="section-header">
+                <span class="section-dot dot-green"></span>
+                TRADING
+            </div>
+            <div class="settings-list">
+                <SettingRow Label="Mode" Value="@_trading.Mode.ToString()"
+                            ValueColor="@(_trading.Mode == TradingMode.Paper ? "var(--yellow)" : "var(--green)")" />
+                <SettingRow Label="Initial Balance" Value="@($"${_trading.InitialBalance:F2}")" />
+                <SettingRow Label="Scan Interval" Value="@($"{_trading.ScanIntervalMinutes} min")" />
+                <SettingRow Label="Max Positions" Value="@_trading.MaxOpenPositions.ToString()" />
+                <SettingRow Label="Position Size" Value="@($"{_trading.MaxPositionSizePercent}%")" />
+                <SettingRow Label="Min Edge" Value="@($"{_trading.MinEdgeThreshold:P0}")" />
+                <SettingRow Label="Min Volume" Value="@($"${_trading.MinVolumeUsd:N0}")" />
+                <SettingRow Label="Max Spread" Value="@($"{_trading.MaxSpreadCents}¢")" />
+                <SettingRow Label="Stop Loss" Value="@($"{_trading.StopLossPercent}%")" />
+                <SettingRow Label="Take Profit" Value="@($"{_trading.TakeProfitPercent}%")" />
+                <SettingRow Label="Survival" Value="@($"${_trading.SurvivalModeThresholdUsd:F2}")" />
+            </div>
         </div>
-        <div class="settings-list">
-            <SettingRow Label="CLOB URL" Value="@_platform.Polymarket.BaseUrl" />
-            <SettingRow Label="Gamma URL" Value="@_platform.Polymarket.GammaBaseUrl" />
-            <SettingRow Label="Chain ID" Value="@_platform.Polymarket.ChainId.ToString()" />
-            <SettingRow Label="Signature Type" Value="@_platform.Polymarket.SignatureType.ToString()" />
+
+        <div class="settings-section">
+            <div class="section-header">
+                <span class="section-dot dot-yellow"></span>
+                PLATFORM
+            </div>
+            <div class="settings-list">
+                <SettingRow Label="CLOB" Value="@_platform.Polymarket.BaseUrl" />
+                <SettingRow Label="Gamma" Value="@_platform.Polymarket.GammaBaseUrl" />
+                <SettingRow Label="Chain" Value="@_platform.Polymarket.ChainId.ToString()" />
+                <SettingRow Label="Sig Type" Value="@_platform.Polymarket.SignatureType.ToString()" />
+            </div>
         </div>
     </div>
 
@@ -73,10 +235,161 @@
     private AiOptions _ai = new();
     private PlatformOptions _platform = new();
 
-    protected override void OnInitialized()
+    private ActiveAiConfigDto? _activeConfig;
+    private List<OpenRouterModelDto> _allModels = [];
+    private AiProviderType _selectedProvider = AiProviderType.OpenRouter;
+    private string _selectedModelId = "";
+    private string _selectedModelName = "";
+    private int _selectedMaxTokens = 4096;
+    private int _selectedContextLength = 128_000;
+    private decimal _selectedPromptPrice;
+    private decimal _selectedCompletionPrice;
+
+    private string _searchText = "";
+    private bool _loadingModels;
+    private bool _saving;
+    private bool _saveSuccess;
+    private string? _saveError;
+
+    private List<ApiKeyStatusDto> _apiKeyStatuses = [];
+    private readonly Dictionary<AiProviderType, string> _apiKeyInputs = new()
+    {
+        [AiProviderType.OpenRouter] = "",
+        [AiProviderType.Anthropic] = "",
+        [AiProviderType.OpenAI] = ""
+    };
+    private bool _keySaving;
+    private bool _keySaveSuccess;
+    private string? _keySaveError;
+
+    private List<OpenRouterModelDto> _filteredModels =>
+        string.IsNullOrWhiteSpace(_searchText)
+            ? _allModels
+            : _allModels
+                .Where(m => m.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ||
+                            m.Id.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+    protected override async Task OnInitializedAsync()
     {
         _trading = TradingOpts.Value;
         _ai = AiOpts.Value;
         _platform = PlatformOpts.Value;
+
+        _activeConfig = await Mediator.Send(new GetActiveAiConfigQuery());
+
+        if (_activeConfig is not null)
+        {
+            _selectedProvider = _activeConfig.Provider;
+            _selectedModelId = _activeConfig.ModelId;
+            _selectedModelName = _activeConfig.DisplayName;
+            _selectedMaxTokens = _activeConfig.MaxTokens;
+            _selectedContextLength = _activeConfig.ContextLength;
+            _selectedPromptPrice = _activeConfig.PromptPricePer1M;
+            _selectedCompletionPrice = _activeConfig.CompletionPricePer1M;
+        }
+
+        if (_selectedProvider == AiProviderType.OpenRouter)
+        {
+            await LoadOpenRouterModelsAsync();
+        }
+
+        _apiKeyStatuses = (await Mediator.Send(new GetApiKeyStatusQuery())).ToList();
+    }
+
+    private async Task OnProviderChanged(AiProviderType provider)
+    {
+        _selectedProvider = provider;
+        _searchText = "";
+        _saveSuccess = false;
+        _saveError = null;
+
+        if (provider == AiProviderType.OpenRouter && _allModels.Count == 0)
+            await LoadOpenRouterModelsAsync();
+        else if (provider == AiProviderType.Anthropic)
+        {
+            _selectedModelId = _ai.Claude.Model;
+            _selectedModelName = "Claude Sonnet 4";
+            _selectedContextLength = 200_000;
+        }
+        else if (provider == AiProviderType.OpenAI)
+        {
+            _selectedModelId = _ai.OpenAI.Model;
+            _selectedModelName = "GPT-4o";
+            _selectedContextLength = 128_000;
+        }
+    }
+
+    private void OnModelSelected(OpenRouterModelDto model)
+    {
+        _selectedModelId = model.Id;
+        _selectedModelName = model.Name;
+        _selectedContextLength = model.ContextLength;
+        _selectedPromptPrice = model.PromptPricePer1M;
+        _selectedCompletionPrice = model.CompletionPricePer1M;
+        _saveSuccess = false;
+    }
+
+    private async Task LoadOpenRouterModelsAsync()
+    {
+        _loadingModels = true;
+        StateHasChanged();
+        try { _allModels = (await Mediator.Send(new GetAvailableModelsQuery())).ToList(); }
+        catch { _allModels = []; }
+        finally { _loadingModels = false; }
+    }
+
+    private async Task SaveModelAsync()
+    {
+        if (string.IsNullOrEmpty(_selectedModelId)) return;
+        _saving = true; _saveSuccess = false; _saveError = null;
+        StateHasChanged();
+        try
+        {
+            var name = string.IsNullOrEmpty(_selectedModelName) ? _selectedModelId : _selectedModelName;
+            var result = await Mediator.Send(new UpdateAiModelCommand(
+                _selectedProvider, _selectedModelId, name,
+                _selectedMaxTokens, _selectedContextLength,
+                _selectedPromptPrice, _selectedCompletionPrice));
+            if (result.IsSuccess)
+            {
+                _saveSuccess = true;
+                _activeConfig = await Mediator.Send(new GetActiveAiConfigQuery());
+            }
+            else _saveError = result.Error.Message;
+        }
+        catch (Exception ex) { _saveError = ex.Message; }
+        finally { _saving = false; }
+    }
+
+    private string GetKeyInput(AiProviderType p)
+        => _apiKeyInputs.TryGetValue(p, out var v) ? v : "";
+
+    private static string GetKeyPlaceholder(AiProviderType p) => p switch
+    {
+        AiProviderType.OpenRouter => "sk-or-v1-...",
+        AiProviderType.Anthropic => "sk-ant-...",
+        AiProviderType.OpenAI => "sk-...",
+        _ => "API Key"
+    };
+
+    private async Task SaveApiKeyAsync(AiProviderType provider)
+    {
+        if (!_apiKeyInputs.TryGetValue(provider, out var key) || string.IsNullOrWhiteSpace(key)) return;
+        _keySaving = true; _keySaveSuccess = false; _keySaveError = null;
+        StateHasChanged();
+        try
+        {
+            var result = await Mediator.Send(new SaveApiKeyCommand(provider, key.Trim()));
+            if (result.IsSuccess)
+            {
+                _keySaveSuccess = true;
+                _apiKeyInputs[provider] = "";
+                _apiKeyStatuses = (await Mediator.Send(new GetApiKeyStatusQuery())).ToList();
+            }
+            else _keySaveError = result.Error.Message;
+        }
+        catch (Exception ex) { _keySaveError = ex.Message; }
+        finally { _keySaving = false; }
     }
 }

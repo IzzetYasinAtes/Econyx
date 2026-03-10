@@ -55,10 +55,16 @@ public sealed class GetDashboardStatsHandler : IRequestHandler<GetDashboardStats
 
         var uptime = DateTime.UtcNow - StartTime;
 
-        var dailyApiCost = 0m;
-        var runwayDays = balance.Amount > 0 && dailyApiCost > 0
+        var totalApiCost = snapshots.Count > 0
+            ? snapshots.Sum(s => s.ApiCosts.Amount)
+            : 0m;
+        var uptimeDays = uptime.TotalDays;
+        var dailyApiCost = uptimeDays >= 1 && totalApiCost > 0
+            ? totalApiCost / (decimal)uptimeDays
+            : 0m;
+        var runwayDays = dailyApiCost > 0
             ? (int)(balance.Amount / dailyApiCost)
-            : int.MaxValue;
+            : -1;
 
         return new DashboardStatsDto(
             balance,

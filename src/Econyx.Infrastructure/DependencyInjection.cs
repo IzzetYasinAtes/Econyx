@@ -1,5 +1,6 @@
 namespace Econyx.Infrastructure;
 
+using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,7 @@ using Econyx.Domain.Repositories;
 using Econyx.Infrastructure.Adapters;
 using Econyx.Infrastructure.Adapters.Polymarket;
 using Econyx.Infrastructure.AiServices;
+using Econyx.Infrastructure.AiServices.OpenRouter;
 using Econyx.Infrastructure.Persistence;
 using Econyx.Infrastructure.Persistence.Repositories;
 using Econyx.Infrastructure.Secrets;
@@ -82,6 +84,8 @@ public static class DependencyInjection
         services.AddScoped<ITradeRepository, TradeRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IBalanceSnapshotRepository, BalanceSnapshotRepository>();
+        services.AddScoped<IAiModelConfigurationRepository, AiModelConfigurationRepository>();
+        services.AddScoped<IApiKeyConfigurationRepository, ApiKeyConfigurationRepository>();
     }
 
     private static void AddPlatformAdapters(this IServiceCollection services, IConfiguration config)
@@ -109,25 +113,59 @@ public static class DependencyInjection
 
         services.AddSingleton(new AiResponseCache(TimeSpan.FromMinutes(aiOptions.CacheDurationMinutes)));
 
-        if (string.Equals(aiOptions.Provider, "Claude", StringComparison.OrdinalIgnoreCase))
+        // Anthropic direct API
+        services.AddSingleton<AnthropicClient>(_ => new AnthropicClient());
+        services.AddSingleton<ClaudeAnalysisService>();
+
+        // OpenAI direct API -- keyed to avoid collision with OpenRouter's IChatClient
+        services.AddKeyedSingleton<IChatClient>("openai-direct", (sp, _) =>
         {
-            services.AddSingleton<AnthropicClient>(_ => new AnthropicClient());
-            services.AddSingleton<IAiAnalysisService, ClaudeAnalysisService>();
-        }
-        else
+            var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? string.Empty;
+            var client = new OpenAIClient(apiKey);
+            return client.GetChatClient(aiOptions.OpenAI.Model).AsIChatClient();
+        });
+        services.AddSingleton<OpenAiAnalysisService>(sp =>
+            new OpenAiAnalysisService(
+                sp.GetRequiredKeyedService<IChatClient>("openai-direct"),
+                Microsoft.Extensions.Options.Options.Create(aiOptions),
+                sp.GetRequiredService<AiResponseCache>(),
+                sp.GetRequiredService<ILogger<OpenAiAnalysisService>>()));
+
+        // OpenRouter gateway -- uses OpenAI-compatible endpoint
+        services.AddHttpClient<IOpenRouterClient, OpenRouterHttpClient>(client =>
         {
-            services.AddSingleton<IChatClient>(sp =>
-            {
-                var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? string.Empty;
-                var client = new OpenAIClient(apiKey);
-                return client.GetChatClient(aiOptions.OpenAI.Model).AsIChatClient();
-            });
-            services.AddSingleton<IAiAnalysisService, OpenAiAnalysisService>();
-        }
+            client.BaseAddress = new Uri(aiOptions.OpenRouter.BaseUrl.TrimEnd('/') + "/");
+            var apiKey = Environment.GetEnvironmentVariable("OPENROUTER_API_KEY") ?? string.Empty;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+            client.DefaultRequestHeaders.Add("X-Title", "Econyx Trading Bot");
+        });
+
+        services.AddKeyedSingleton<IChatClient>("openrouter", (sp, _) =>
+        {
+            var orApiKey = Environment.GetEnvironmentVariable("OPENROUTER_API_KEY") ?? string.Empty;
+            var orClient = new OpenAIClient(
+                new System.ClientModel.ApiKeyCredential(orApiKey),
+                new OpenAI.OpenAIClientOptions
+                {
+                    Endpoint = new Uri(aiOptions.OpenRouter.BaseUrl)
+                });
+            return orClient.GetChatClient(aiOptions.OpenRouter.DefaultModel).AsIChatClient();
+        });
+
+        services.AddSingleton<OpenRouterAnalysisService>(sp =>
+            new OpenRouterAnalysisService(
+                sp.GetRequiredKeyedService<IChatClient>("openrouter"),
+                sp.GetRequiredService<AiResponseCache>(),
+                sp.GetRequiredService<ILogger<OpenRouterAnalysisService>>()));
+
+        // Factory -- resolves the active provider at runtime
+        services.AddSingleton<IAiProviderFactory, AiProviderFactory>();
     }
 
     private static void AddSecretManagers(this IServiceCollection services, IConfiguration config)
     {
+        services.AddSingleton<IApiKeyEncryptor, ApiKeyEncryptor>();
+
         var useKeyVault = !string.IsNullOrEmpty(config["Azure:KeyVault:VaultUri"]);
 
         if (useKeyVault)
