@@ -1,14 +1,14 @@
 namespace Econyx.Application.Queries.GetOpenPositions;
 
-using Econyx.Core.Interfaces;
 using Econyx.Domain.Entities;
+using Econyx.Domain.Repositories;
 using MediatR;
 
 public sealed class GetOpenPositionsHandler : IRequestHandler<GetOpenPositionsQuery, IReadOnlyList<PositionDto>>
 {
-    private readonly IRepository<Position, Guid> _positionRepository;
+    private readonly IPositionRepository _positionRepository;
 
-    public GetOpenPositionsHandler(IRepository<Position, Guid> positionRepository)
+    public GetOpenPositionsHandler(IPositionRepository positionRepository)
     {
         _positionRepository = positionRepository;
     }

@@ -8,6 +8,7 @@ public sealed class Probability : ValueObject, IComparable<Probability>
 {
     public decimal Value { get; }
 
+    private Probability() => Value = 0;
     private Probability(decimal value) => Value = value;
 
     public static Probability Create(decimal value)

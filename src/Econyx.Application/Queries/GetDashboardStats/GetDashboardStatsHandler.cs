@@ -2,8 +2,8 @@ namespace Econyx.Application.Queries.GetDashboardStats;
 
 using Econyx.Application.Configuration;
 using Econyx.Application.Ports;
-using Econyx.Core.Interfaces;
 using Econyx.Domain.Entities;
+using Econyx.Domain.Repositories;
 using Econyx.Domain.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Options;
@@ -11,17 +11,17 @@ using Microsoft.Extensions.Options;
 public sealed class GetDashboardStatsHandler : IRequestHandler<GetDashboardStatsQuery, DashboardStatsDto>
 {
     private readonly IPlatformAdapter _platform;
-    private readonly IRepository<Position, Guid> _positionRepository;
-    private readonly IRepository<Trade, Guid> _tradeRepository;
-    private readonly IRepository<BalanceSnapshot, Guid> _snapshotRepository;
+    private readonly IPositionRepository _positionRepository;
+    private readonly ITradeRepository _tradeRepository;
+    private readonly IBalanceSnapshotRepository _snapshotRepository;
     private readonly TradingOptions _options;
     private static readonly DateTime StartTime = DateTime.UtcNow;
 
     public GetDashboardStatsHandler(
         IPlatformAdapter platform,
-        IRepository<Position, Guid> positionRepository,
-        IRepository<Trade, Guid> tradeRepository,
-        IRepository<BalanceSnapshot, Guid> snapshotRepository,
+        IPositionRepository positionRepository,
+        ITradeRepository tradeRepository,
+        IBalanceSnapshotRepository snapshotRepository,
         IOptions<TradingOptions> options)
     {
         _platform = platform;

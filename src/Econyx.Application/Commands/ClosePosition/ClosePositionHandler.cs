@@ -3,18 +3,19 @@ namespace Econyx.Application.Commands.ClosePosition;
 using Econyx.Core.Interfaces;
 using Econyx.Core.Primitives;
 using Econyx.Domain.Entities;
+using Econyx.Domain.Repositories;
 using Econyx.Domain.ValueObjects;
 using MediatR;
 
 public sealed class ClosePositionHandler : IRequestHandler<ClosePositionCommand, Result<Money>>
 {
-    private readonly IRepository<Position, Guid> _positionRepository;
-    private readonly IRepository<Trade, Guid> _tradeRepository;
+    private readonly IPositionRepository _positionRepository;
+    private readonly ITradeRepository _tradeRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public ClosePositionHandler(
-        IRepository<Position, Guid> positionRepository,
-        IRepository<Trade, Guid> tradeRepository,
+        IPositionRepository positionRepository,
+        ITradeRepository tradeRepository,
         IUnitOfWork unitOfWork)
     {
         _positionRepository = positionRepository;

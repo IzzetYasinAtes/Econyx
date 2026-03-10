@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenAI;
 using Anthropic.SDK;
 using Econyx.Application.Configuration;
@@ -31,11 +32,44 @@ public static class DependencyInjection
         return services;
     }
 
+    public static async Task ApplyMigrationsAsync(this IServiceProvider serviceProvider)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<EconyxDbContext>();
+        var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
+        var logger = loggerFactory.CreateLogger("Econyx.Migrations");
+
+        MigrationLog.CheckingMigrations(logger);
+
+        try
+        {
+            var pending = await db.Database.GetPendingMigrationsAsync();
+            var pendingList = pending.ToList();
+
+            if (pendingList.Count > 0)
+            {
+                MigrationLog.PendingMigrationsFound(logger, pendingList.Count);
+                await db.Database.MigrateAsync();
+                MigrationLog.MigrationCompleted(logger);
+            }
+            else
+            {
+                MigrationLog.DatabaseUpToDate(logger);
+            }
+        }
+        catch (Exception ex)
+        {
+            MigrationLog.MigrationFailed(logger, ex);
+            await db.Database.EnsureCreatedAsync();
+            MigrationLog.DatabaseCreated(logger);
+        }
+    }
+
     private static void AddPersistence(this IServiceCollection services, IConfiguration config)
     {
         services.AddDbContext<EconyxDbContext>(options =>
             options.UseSqlServer(
-                config.GetConnectionString("Default"),
+                config.GetConnectionString("DefaultConnection"),
                 sql => sql.MigrationsAssembly(typeof(EconyxDbContext).Assembly.FullName)));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -105,4 +139,25 @@ public static class DependencyInjection
             services.AddSingleton<ISecretManager, DpapiSecretManager>();
         }
     }
+}
+
+internal static partial class MigrationLog
+{
+    [LoggerMessage(Level = LogLevel.Information, Message = "Veritabani migration kontrolu yapiliyor...")]
+    public static partial void CheckingMigrations(ILogger logger);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Count} bekleyen migration bulundu, uygulaniyor...")]
+    public static partial void PendingMigrationsFound(ILogger logger, int count);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Migration basariyla tamamlandi.")]
+    public static partial void MigrationCompleted(ILogger logger);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Veritabani guncel, bekleyen migration yok.")]
+    public static partial void DatabaseUpToDate(ILogger logger);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Migration sirasinda hata olustu. EnsureCreated deneniyor...")]
+    public static partial void MigrationFailed(ILogger logger, Exception ex);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Veritabani EnsureCreated ile olusturuldu.")]
+    public static partial void DatabaseCreated(ILogger logger);
 }

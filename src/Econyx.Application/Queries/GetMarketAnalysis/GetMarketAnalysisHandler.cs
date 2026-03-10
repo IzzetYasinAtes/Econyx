@@ -1,17 +1,17 @@
 namespace Econyx.Application.Queries.GetMarketAnalysis;
 
 using Econyx.Application.Ports;
-using Econyx.Core.Interfaces;
 using Econyx.Domain.Entities;
+using Econyx.Domain.Repositories;
 using MediatR;
 
 public sealed class GetMarketAnalysisHandler : IRequestHandler<GetMarketAnalysisQuery, MarketAnalysisDto?>
 {
-    private readonly IRepository<Market, Guid> _marketRepository;
+    private readonly IMarketRepository _marketRepository;
     private readonly IAiAnalysisService _aiService;
 
     public GetMarketAnalysisHandler(
-        IRepository<Market, Guid> marketRepository,
+        IMarketRepository marketRepository,
         IAiAnalysisService aiService)
     {
         _marketRepository = marketRepository;

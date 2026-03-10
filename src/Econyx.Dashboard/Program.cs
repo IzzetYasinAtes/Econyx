@@ -57,6 +57,8 @@ try
     app.MapRazorComponents<App>()
         .AddInteractiveServerRenderMode();
 
+    await app.Services.ApplyMigrationsAsync();
+
     Log.Information("Econyx Dashboard starting...");
     app.Run();
 }

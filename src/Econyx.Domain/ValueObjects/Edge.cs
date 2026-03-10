@@ -8,6 +8,7 @@ public sealed class Edge : ValueObject, IComparable<Edge>
 {
     public decimal Value { get; }
 
+    private Edge() => Value = 0;
     private Edge(decimal value) => Value = value;
 
     public static Edge Create(decimal value) => new(value);

@@ -1,14 +1,14 @@
 namespace Econyx.Application.Queries.GetTradeHistory;
 
-using Econyx.Core.Interfaces;
 using Econyx.Domain.Entities;
+using Econyx.Domain.Repositories;
 using MediatR;
 
 public sealed class GetTradeHistoryHandler : IRequestHandler<GetTradeHistoryQuery, TradeHistoryDto>
 {
-    private readonly IRepository<Trade, Guid> _tradeRepository;
+    private readonly ITradeRepository _tradeRepository;
 
-    public GetTradeHistoryHandler(IRepository<Trade, Guid> tradeRepository)
+    public GetTradeHistoryHandler(ITradeRepository tradeRepository)
     {
         _tradeRepository = tradeRepository;
     }

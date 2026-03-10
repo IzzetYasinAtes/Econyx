@@ -36,6 +36,9 @@ try
     builder.Services.AddHostedService<HealthMonitorService>();
 
     var host = builder.Build();
+
+    await host.Services.ApplyMigrationsAsync();
+
     await host.RunAsync();
 }
 catch (Exception ex)

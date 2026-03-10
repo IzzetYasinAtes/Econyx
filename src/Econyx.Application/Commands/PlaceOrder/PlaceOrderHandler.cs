@@ -5,18 +5,19 @@ using Econyx.Core.Interfaces;
 using Econyx.Core.Primitives;
 using Econyx.Domain.Entities;
 using Econyx.Domain.Enums;
+using Econyx.Domain.Repositories;
 using Econyx.Domain.ValueObjects;
 using MediatR;
 
 public sealed class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Result<Guid>>
 {
     private readonly IPlatformAdapter _platform;
-    private readonly IRepository<Order, Guid> _orderRepository;
+    private readonly IOrderRepository _orderRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public PlaceOrderHandler(
         IPlatformAdapter platform,
-        IRepository<Order, Guid> orderRepository,
+        IOrderRepository orderRepository,
         IUnitOfWork unitOfWork)
     {
         _platform = platform;
