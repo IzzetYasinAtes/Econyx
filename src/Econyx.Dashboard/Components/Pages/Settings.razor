@@ -62,7 +62,7 @@
         <div class="settings-section flex-fill">
             <div class="section-header">
                 <span class="section-dot dot-blue"></span>
-                MODEL SEC
+                SELECT MODEL
             </div>
             <div class="model-panel">
                 <div class="provider-tabs">
@@ -78,7 +78,7 @@
                 @if (_selectedProvider == AiProviderType.OpenRouter)
                 {
                     <div class="search-wrapper">
-                        <input type="text" class="form-input" placeholder="Model ara..."
+                        <input type="text" class="form-input" placeholder="Search models..."
                                @bind="_searchText" @bind:event="oninput" />
                         @if (_loadingModels)
                         {
@@ -88,7 +88,7 @@
                     <div class="model-list">
                         @if (_filteredModels.Count == 0 && !_loadingModels)
                         {
-                            <div class="model-empty text-muted">Model bulunamadi</div>
+                            <div class="model-empty text-muted">No models found</div>
                         }
                         @foreach (var model in _filteredModels.Take(80))
                         {
@@ -137,7 +137,7 @@
                     </div>
                     <button class="btn-save" @onclick="SaveModelAsync"
                             disabled="@(string.IsNullOrEmpty(_selectedModelId) || _saving)">
-                        @(_saving ? "..." : "Kaydet")
+                        @(_saving ? "..." : "Save")
                     </button>
                 </div>
                 @if (!string.IsNullOrEmpty(_saveError))
@@ -168,7 +168,7 @@
                             }
                             else
                             {
-                                <span class="badge key-miss">Yok</span>
+                                <span class="badge key-miss">None</span>
                             }
                         </div>
                         <div class="key-row-input">
@@ -178,7 +178,7 @@
                             <button class="btn-key"
                                     @onclick="() => SaveApiKeyAsync(provider)"
                                     disabled="@(string.IsNullOrWhiteSpace(GetKeyInput(provider)) || _keySaving)">
-                                Kaydet
+                                Save
                             </button>
                         </div>
                     </div>

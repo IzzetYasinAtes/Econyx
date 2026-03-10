@@ -8,9 +8,12 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<EconyxDbCo
 {
     public EconyxDbContext CreateDbContext(string[] args)
     {
+        var connectionString = Environment.GetEnvironmentVariable("ECONYX_CONNECTION_STRING")
+            ?? "Server=localhost,1433;Database=EconyxDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;";
+
         var optionsBuilder = new DbContextOptionsBuilder<EconyxDbContext>();
         optionsBuilder.UseSqlServer(
-            "Server=(localdb)\\MSSQLLocalDB;Database=EconyxDb;Trusted_Connection=True;TrustServerCertificate=True;",
+            connectionString,
             sql => sql.MigrationsAssembly(typeof(EconyxDbContext).Assembly.FullName));
 
         return new EconyxDbContext(optionsBuilder.Options, new NoOpMediator());

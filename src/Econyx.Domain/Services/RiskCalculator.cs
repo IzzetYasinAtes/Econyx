@@ -4,9 +4,6 @@ namespace Econyx.Domain.Services;
 
 public static class RiskCalculator
 {
-    /// <summary>
-    /// Simplified Kelly criterion: fraction = edge / odds, capped at maxPositionSizePercent.
-    /// </summary>
     public static Money CalculatePositionSize(
         Money balance,
         Edge edge,

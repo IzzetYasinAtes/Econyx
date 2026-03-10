@@ -27,7 +27,7 @@ public sealed class HealthMonitorService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("HealthMonitorService başlatıldı — kontrol aralığı: {Interval} dk",
+        _logger.LogInformation("HealthMonitorService started — check interval: {Interval} min",
             CheckInterval.TotalMinutes);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -42,7 +42,7 @@ public sealed class HealthMonitorService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Sağlık kontrolleri sırasında hata oluştu");
+                _logger.LogError(ex, "Error during health checks");
             }
 
             await Task.Delay(CheckInterval, stoppingToken);
@@ -57,16 +57,16 @@ public sealed class HealthMonitorService : BackgroundService
         var balanceOk = await CheckBalanceAsync(ct);
 
         _logger.LogInformation(
-            "Sağlık raporu — çalışma süresi: {Uptime:d\\.hh\\:mm\\:ss}, platform: {Platform}, veritabanı: {Db}, bakiye: {Balance}",
+            "Health report — uptime: {Uptime:d\\.hh\\:mm\\:ss}, platform: {Platform}, database: {Db}, balance: {Balance}",
             uptime,
-            platformOk ? "OK" : "HATA",
-            dbOk ? "OK" : "HATA",
-            balanceOk ? "OK" : "KRİTİK");
+            platformOk ? "OK" : "FAIL",
+            dbOk ? "OK" : "FAIL",
+            balanceOk ? "OK" : "CRITICAL");
 
         if (!balanceOk)
         {
             _logger.LogCritical(
-                "Bakiye hayatta kalma eşiğinin ({Threshold} USD) altında! İşlem durdurmayı değerlendirin.",
+                "Balance is below survival threshold ({Threshold} USD)! Consider halting trading.",
                 _tradingOptions.SurvivalModeThresholdUsd);
         }
     }
@@ -82,7 +82,7 @@ public sealed class HealthMonitorService : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Platform API erişim kontrolü başarısız");
+            _logger.LogWarning(ex, "Platform API health check failed");
             return false;
         }
     }
@@ -98,7 +98,7 @@ public sealed class HealthMonitorService : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Veritabanı erişim kontrolü başarısız");
+            _logger.LogWarning(ex, "Database health check failed");
             return false;
         }
     }
@@ -119,7 +119,7 @@ public sealed class HealthMonitorService : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Bakiye kontrol edilirken hata");
+            _logger.LogWarning(ex, "Error checking balance");
             return false;
         }
     }

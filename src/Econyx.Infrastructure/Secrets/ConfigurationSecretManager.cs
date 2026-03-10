@@ -4,12 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Econyx.Application.Ports;
 
-internal sealed partial class DpapiSecretManager : ISecretManager
+internal sealed partial class ConfigurationSecretManager : ISecretManager
 {
     private readonly IConfiguration _configuration;
-    private readonly ILogger<DpapiSecretManager> _logger;
+    private readonly ILogger<ConfigurationSecretManager> _logger;
 
-    public DpapiSecretManager(IConfiguration configuration, ILogger<DpapiSecretManager> logger)
+    public ConfigurationSecretManager(IConfiguration configuration, ILogger<ConfigurationSecretManager> logger)
     {
         _configuration = configuration;
         _logger = logger;
@@ -29,12 +29,12 @@ internal sealed partial class DpapiSecretManager : ISecretManager
     {
         LogSetSecretNotSupported(_logger);
         throw new NotSupportedException(
-            "DPAPI-backed configuration is read-only at runtime. Use 'dotnet user-secrets set' to manage secrets.");
+            "Configuration is read-only at runtime. Use 'dotnet user-secrets set' or environment variables to manage secrets.");
     }
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Retrieved secret '{Name}' from configuration")]
     private static partial void LogSecretRetrieved(ILogger logger, string name);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "SetSecretAsync is not supported by DpapiSecretManager. Use 'dotnet user-secrets set' instead.")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "SetSecretAsync is not supported by ConfigurationSecretManager")]
     private static partial void LogSetSecretNotSupported(ILogger logger);
 }

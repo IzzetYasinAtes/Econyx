@@ -38,8 +38,6 @@ public sealed class RuleBasedStrategy : IStrategy
 
                 if (price < 0.15m)
                 {
-                    var fairValue = Probability.Create(price);
-                    var edge = Edge.Create(price - price);
                     var buyEdge = 0.15m - price;
 
                     if (buyEdge >= _options.MinEdgeThreshold)

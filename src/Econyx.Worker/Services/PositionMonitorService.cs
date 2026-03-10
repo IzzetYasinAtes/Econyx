@@ -31,7 +31,7 @@ public sealed class PositionMonitorService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation(
-            "PositionMonitorService başlatıldı — SL: %{SL}, TP: %{TP}",
+            "PositionMonitorService started — SL: %{SL}, TP: %{TP}",
             _tradingOptions.StopLossPercent,
             _tradingOptions.TakeProfitPercent);
 
@@ -47,7 +47,7 @@ public sealed class PositionMonitorService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Pozisyon izleme sırasında hata oluştu");
+                _logger.LogError(ex, "Error during position monitoring");
             }
 
             await Task.Delay(CheckInterval, stoppingToken);
@@ -67,7 +67,7 @@ public sealed class PositionMonitorService : BackgroundService
         if (openPositions.Count == 0)
             return;
 
-        _logger.LogDebug("{Count} açık pozisyon izleniyor", openPositions.Count);
+        _logger.LogDebug("Monitoring {Count} open positions", openPositions.Count);
 
         foreach (var position in openPositions)
         {
@@ -77,7 +77,7 @@ public sealed class PositionMonitorService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Pozisyon değerlendirme hatası — PositionId: {Id}", position.Id);
+                _logger.LogWarning(ex, "Position evaluation error — PositionId: {Id}", position.Id);
             }
         }
     }
@@ -98,7 +98,7 @@ public sealed class PositionMonitorService : BackgroundService
                 : position.CurrentPrice;
 
             _logger.LogInformation(
-                "Pazar çözümlendi — pozisyon kapatılıyor: {Market}", position.MarketQuestion);
+                "Market resolved — closing position: {Market}", position.MarketQuestion);
 
             await mediator.Send(new ClosePositionCommand(position.Id, resolvedPrice), ct);
             return;
@@ -123,7 +123,7 @@ public sealed class PositionMonitorService : BackgroundService
         if (pnlPercent <= -_tradingOptions.StopLossPercent)
         {
             _logger.LogWarning(
-                "Stop-loss tetiklendi — pozisyon: {Market}, PnL: {PnL}%",
+                "Stop-loss triggered — position: {Market}, PnL: {PnL}%",
                 position.MarketQuestion, pnlPercent.ToString("F2"));
 
             await mediator.Send(new ClosePositionCommand(position.Id, currentPrice), ct);
@@ -131,7 +131,7 @@ public sealed class PositionMonitorService : BackgroundService
         else if (pnlPercent >= _tradingOptions.TakeProfitPercent)
         {
             _logger.LogInformation(
-                "Take-profit tetiklendi — pozisyon: {Market}, PnL: {PnL}%",
+                "Take-profit triggered — position: {Market}, PnL: {PnL}%",
                 position.MarketQuestion, pnlPercent.ToString("F2"));
 
             await mediator.Send(new ClosePositionCommand(position.Id, currentPrice), ct);

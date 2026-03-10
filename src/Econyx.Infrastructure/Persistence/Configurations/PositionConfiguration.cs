@@ -33,22 +33,11 @@ internal sealed class PositionConfiguration : IEntityTypeConfiguration<Position>
             .HasMaxLength(200)
             .IsRequired();
 
-        builder.OwnsOne(p => p.EntryPrice, ConfigureMoney("Entry"));
-        builder.OwnsOne(p => p.CurrentPrice, ConfigureMoney("Current"));
-        builder.OwnsOne(p => p.ExitPrice, ConfigureMoney("Exit"));
+        builder.OwnsOne(p => p.EntryPrice, b => b.ConfigureMoney("EntryPrice"));
+        builder.OwnsOne(p => p.CurrentPrice, b => b.ConfigureMoney("CurrentPrice"));
+        builder.OwnsOne(p => p.ExitPrice, b => b.ConfigureMoney("ExitPrice"));
 
         builder.HasIndex(p => p.IsOpen);
         builder.HasIndex(p => p.MarketId);
     }
-
-    private static Action<OwnedNavigationBuilder<Position, Domain.ValueObjects.Money>> ConfigureMoney(string prefix)
-        => mb =>
-        {
-            mb.Property(m => m.Amount)
-                .HasColumnName($"{prefix}PriceAmount")
-                .HasPrecision(18, 6);
-            mb.Property(m => m.Currency)
-                .HasColumnName($"{prefix}PriceCurrency")
-                .HasMaxLength(10);
-        };
 }

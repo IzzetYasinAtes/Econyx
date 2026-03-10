@@ -1,18 +1,27 @@
 using System.Security.Cryptography;
 using System.Text;
 using Econyx.Application.Ports;
+using Microsoft.Extensions.Configuration;
 
 namespace Econyx.Infrastructure.Secrets;
 
 internal sealed class ApiKeyEncryptor : IApiKeyEncryptor
 {
-    private static readonly byte[] Key = DeriveKey();
+    private readonly byte[] _key;
     private const int IvSize = 16;
+
+    public ApiKeyEncryptor(IConfiguration configuration)
+    {
+        var salt = configuration["Encryption:Salt"] ?? "Econyx-Default-Salt-2024";
+        _key = DeriveKey(salt);
+    }
 
     public string Encrypt(string plainText)
     {
+        ArgumentException.ThrowIfNullOrEmpty(plainText);
+
         using var aes = Aes.Create();
-        aes.Key = Key;
+        aes.Key = _key;
         aes.GenerateIV();
 
         using var encryptor = aes.CreateEncryptor();
@@ -28,7 +37,12 @@ internal sealed class ApiKeyEncryptor : IApiKeyEncryptor
 
     public string Decrypt(string cipherText)
     {
+        ArgumentException.ThrowIfNullOrEmpty(cipherText);
+
         var fullBytes = Convert.FromBase64String(cipherText);
+
+        if (fullBytes.Length <= IvSize)
+            throw new CryptographicException("Invalid cipher text length.");
 
         var iv = new byte[IvSize];
         Buffer.BlockCopy(fullBytes, 0, iv, 0, IvSize);
@@ -37,7 +51,7 @@ internal sealed class ApiKeyEncryptor : IApiKeyEncryptor
         Buffer.BlockCopy(fullBytes, IvSize, cipherBytes, 0, cipherBytes.Length);
 
         using var aes = Aes.Create();
-        aes.Key = Key;
+        aes.Key = _key;
         aes.IV = iv;
 
         using var decryptor = aes.CreateDecryptor();
@@ -54,9 +68,9 @@ internal sealed class ApiKeyEncryptor : IApiKeyEncryptor
         return $"{apiKey[..4]}...{apiKey[^4..]}";
     }
 
-    private static byte[] DeriveKey()
+    private static byte[] DeriveKey(string salt)
     {
-        var machineId = Environment.MachineName + Environment.UserName;
-        return SHA256.HashData(Encoding.UTF8.GetBytes(machineId));
+        var keyMaterial = $"{Environment.MachineName}-{Environment.UserName}-{salt}";
+        return SHA256.HashData(Encoding.UTF8.GetBytes(keyMaterial));
     }
 }

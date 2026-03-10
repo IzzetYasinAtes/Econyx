@@ -54,7 +54,7 @@ internal sealed class MarketConfiguration : IEntityTypeConfiguration<Market>
 
             ob.OwnsOne(o => o.Price, pb =>
             {
-                pb.Property(p => p.Value).HasJsonPropertyName("price");
+                pb.Property(p => p.Value).HasJsonPropertyName("price").HasPrecision(5, 4);
             });
 
             ob.OwnsOne(o => o.Token, tb =>

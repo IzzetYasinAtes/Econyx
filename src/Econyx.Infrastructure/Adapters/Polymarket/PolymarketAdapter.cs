@@ -73,14 +73,12 @@ internal sealed partial class PolymarketAdapter : IPlatformAdapter
 
     public Task<Money> GetBalanceAsync(CancellationToken ct = default)
     {
-        // TODO: Implement using web3/USDC contract balance check
         LogBalanceNotImplemented(_logger);
         return Task.FromResult(Money.Zero());
     }
 
     public Task<string> PlaceOrderAsync(PlaceOrderRequest request, CancellationToken ct = default)
     {
-        // TODO: Implement using ClobApi.Trading.PlaceOrderAsync
         LogPlaceOrderNotImplemented(_logger);
         throw new NotImplementedException(
             "Live order placement requires Polymarket CLOB signing integration. Use PaperTrading mode for now.");
@@ -88,7 +86,6 @@ internal sealed partial class PolymarketAdapter : IPlatformAdapter
 
     public Task CancelOrderAsync(string platformOrderId, CancellationToken ct = default)
     {
-        // TODO: Implement using ClobApi.Trading.CancelOrderAsync
         LogCancelOrderNotImplemented(_logger);
         throw new NotImplementedException(
             "Live order cancellation requires Polymarket CLOB signing integration. Use PaperTrading mode for now.");

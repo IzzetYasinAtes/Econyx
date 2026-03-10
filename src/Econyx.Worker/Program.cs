@@ -10,7 +10,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Log.Information("Econyx Worker başlatılıyor...");
+    Log.Information("Econyx Worker starting...");
 
     var builder = Host.CreateApplicationBuilder(args);
 
@@ -43,7 +43,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Econyx Worker beklenmedik şekilde sonlandı");
+    Log.Fatal(ex, "Econyx Worker terminated unexpectedly");
 }
 finally
 {

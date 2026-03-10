@@ -41,7 +41,6 @@ public sealed class GetMarketAnalysisHandler : IRequestHandler<GetMarketAnalysis
         }
         catch
         {
-            // AI analysis is best-effort
         }
 
         var outcomes = market.Outcomes

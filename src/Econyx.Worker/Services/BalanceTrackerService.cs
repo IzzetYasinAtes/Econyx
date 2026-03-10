@@ -21,7 +21,7 @@ public sealed class BalanceTrackerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("BalanceTrackerService başlatıldı — anlık görüntü aralığı: {Interval} dk",
+        _logger.LogInformation("BalanceTrackerService started — snapshot interval: {Interval} min",
             SnapshotInterval.TotalMinutes);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -40,8 +40,8 @@ public sealed class BalanceTrackerService : BackgroundService
                     if (latest is not null)
                     {
                         _logger.LogInformation(
-                            "Bakiye anlık görüntüsü alındı — bakiye: {Balance}, PnL: {PnL} ({PnLPct:F2}%), " +
-                            "açık pozisyon: {Open}, toplam işlem: {Trades}, kazanma oranı: {WinRate:F1}%",
+                            "Balance snapshot taken — balance: {Balance}, PnL: {PnL} ({PnLPct:F2}%), " +
+                            "open positions: {Open}, total trades: {Trades}, win rate: {WinRate:F1}%",
                             latest.Balance,
                             latest.TotalPnL,
                             latest.TotalPnLPercent,
@@ -52,7 +52,7 @@ public sealed class BalanceTrackerService : BackgroundService
                 }
                 else
                 {
-                    _logger.LogWarning("Bakiye anlık görüntüsü alınamadı: {Error}", result.Error);
+                    _logger.LogWarning("Failed to take balance snapshot: {Error}", result.Error);
                 }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
@@ -61,7 +61,7 @@ public sealed class BalanceTrackerService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Bakiye izleme sırasında hata oluştu");
+                _logger.LogError(ex, "Error during balance tracking");
             }
 
             await Task.Delay(SnapshotInterval, stoppingToken);

@@ -71,7 +71,7 @@ internal sealed partial class AiProviderFactory : IAiProviderFactory
         if (string.IsNullOrEmpty(apiKey))
         {
             throw new InvalidOperationException(
-                $"{provider} API key'i bulunamadi. Dashboard > Settings sayfasindan API key giriniz.");
+                $"{provider} API key not found. Please enter the API key from Dashboard > Settings.");
         }
 
         return ResolveProvider(provider, modelId, maxTokens, promptPrice, completionPrice, apiKey);
@@ -90,13 +90,12 @@ internal sealed partial class AiProviderFactory : IAiProviderFactory
             {
                 return encryptor.Decrypt(keyConfig.EncryptedKey);
             }
-            catch
+            catch (Exception ex)
             {
-                LogKeyDecryptFailed(_logger, provider);
+                LogKeyDecryptFailed(_logger, provider, ex);
             }
         }
 
-        // Environment variable'dan da dene
         return provider switch
         {
             AiProviderType.OpenRouter => Environment.GetEnvironmentVariable("OPENROUTER_API_KEY"),
@@ -127,12 +126,12 @@ internal sealed partial class AiProviderFactory : IAiProviderFactory
         return service;
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Veritabanindan AI konfigurasyonu yuklendi: {Provider} / {ModelId}")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "AI configuration loaded from database: {Provider} / {ModelId}")]
     private static partial void LogUsingDbConfig(ILogger logger, AiProviderType provider, string modelId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Varsayilan AI konfigurasyonu kullaniliyor: {Provider}")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Using default AI configuration: {Provider}")]
     private static partial void LogUsingDefaultConfig(ILogger logger, AiProviderType provider);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "{Provider} API key DB'den decrypt edilemedi, environment variable deneniyor")]
-    private static partial void LogKeyDecryptFailed(ILogger logger, AiProviderType provider);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "{Provider} API key decryption from DB failed, trying environment variable")]
+    private static partial void LogKeyDecryptFailed(ILogger logger, AiProviderType provider, Exception ex);
 }

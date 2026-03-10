@@ -9,7 +9,7 @@ public sealed class Money : ValueObject, IComparable<Money>
     public decimal Amount { get; }
     public string Currency { get; }
 
-    #pragma warning disable CS8618 // EF Core requires parameterless constructor for owned types
+    #pragma warning disable CS8618
     private Money() { }
     #pragma warning restore CS8618
 

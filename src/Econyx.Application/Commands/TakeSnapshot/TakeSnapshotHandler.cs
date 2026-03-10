@@ -2,6 +2,7 @@ namespace Econyx.Application.Commands.TakeSnapshot;
 
 using Econyx.Application.Configuration;
 using Econyx.Application.Ports;
+using Econyx.Application.Services;
 using Econyx.Core.Interfaces;
 using Econyx.Core.Primitives;
 using Econyx.Domain.Entities;
@@ -41,17 +42,12 @@ public sealed class TakeSnapshotHandler : IRequestHandler<TakeSnapshotCommand, R
         var openPositions = await _positionRepository.FindAsync(p => p.IsOpen, cancellationToken);
         var allTrades = await _tradeRepository.GetAllAsync(cancellationToken);
 
-        var totalPnL = allTrades.Count > 0
-            ? allTrades.Aggregate(Money.Zero(), (sum, t) => sum + t.PnL)
-            : Money.Zero();
+        var (totalPnL, winRate) = TradeStatsCalculator.Calculate(allTrades);
 
         var initialBalance = Money.Create(_options.InitialBalance);
         var totalPnLPercent = initialBalance.Amount > 0
             ? totalPnL.Amount / initialBalance.Amount * 100m
             : 0m;
-
-        var winCount = allTrades.Count(t => t.PnL.Amount > 0);
-        var winRate = allTrades.Count > 0 ? (decimal)winCount / allTrades.Count : 0m;
 
         var snapshot = BalanceSnapshot.Create(
             balance,

@@ -89,10 +89,6 @@ else
     private async Task PrevPage() { _page = Math.Max(1, _page - 1); await LoadTrades(); }
     private async Task NextPage() { _page = Math.Min(_totalPages, _page + 1); await LoadTrades(); }
 
-    private static string PnLClass(decimal v) => v >= 0 ? "text-green" : "text-red";
-    private static string FormatPnL(decimal v) => v >= 0 ? $"+${v:F2}" : $"-${Math.Abs(v):F2}";
-    private static string Truncate(string s, int max) => s.Length <= max ? s : string.Concat(s.AsSpan(0, max), "...");
-
     private static string FormatDuration(TimeSpan ts) => ts.TotalHours >= 1
         ? $"{ts.TotalHours:F1}h"
         : $"{ts.TotalMinutes:F0}m";

@@ -8,7 +8,7 @@ public sealed class MarketOutcome : ValueObject
     public Probability Price { get; }
     public TokenId Token { get; }
 
-    #pragma warning disable CS8618 // EF Core requires parameterless constructor for owned types
+    #pragma warning disable CS8618
     private MarketOutcome() { }
     #pragma warning restore CS8618
 

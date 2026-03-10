@@ -50,21 +50,10 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.RejectionReason)
             .HasMaxLength(1000);
 
-        builder.OwnsOne(o => o.Price, ConfigureMoney("Order"));
-        builder.OwnsOne(o => o.FilledPrice, ConfigureMoney("Filled"));
+        builder.OwnsOne(o => o.Price, b => b.ConfigureMoney("OrderPrice"));
+        builder.OwnsOne(o => o.FilledPrice, b => b.ConfigureMoney("FilledPrice"));
 
         builder.HasIndex(o => o.Status);
         builder.HasIndex(o => o.MarketId);
     }
-
-    private static Action<OwnedNavigationBuilder<Order, Money>> ConfigureMoney(string prefix)
-        => mb =>
-        {
-            mb.Property(m => m.Amount)
-                .HasColumnName($"{prefix}PriceAmount")
-                .HasPrecision(18, 6);
-            mb.Property(m => m.Currency)
-                .HasColumnName($"{prefix}PriceCurrency")
-                .HasMaxLength(10);
-        };
 }

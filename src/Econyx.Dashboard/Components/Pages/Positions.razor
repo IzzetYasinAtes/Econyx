@@ -69,11 +69,4 @@ else
         catch { _positions = []; }
     }
 
-    private static string PnLClass(decimal v) => v >= 0 ? "text-green" : "text-red";
-
-    private static string FormatPnL(decimal v) =>
-        v >= 0 ? $"+${v:F2}" : $"-${Math.Abs(v):F2}";
-
-    private static string Truncate(string s, int max) =>
-        s.Length <= max ? s : string.Concat(s.AsSpan(0, max), "...");
 }

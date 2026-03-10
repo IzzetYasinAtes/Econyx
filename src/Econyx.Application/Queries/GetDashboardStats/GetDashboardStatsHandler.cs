@@ -2,7 +2,7 @@ namespace Econyx.Application.Queries.GetDashboardStats;
 
 using Econyx.Application.Configuration;
 using Econyx.Application.Ports;
-using Econyx.Domain.Entities;
+using Econyx.Application.Services;
 using Econyx.Domain.Repositories;
 using Econyx.Domain.ValueObjects;
 using MediatR;
@@ -38,12 +38,7 @@ public sealed class GetDashboardStatsHandler : IRequestHandler<GetDashboardStats
         var allTrades = await _tradeRepository.GetAllAsync(cancellationToken);
         var snapshots = await _snapshotRepository.GetAllAsync(cancellationToken);
 
-        var totalPnL = allTrades.Count > 0
-            ? allTrades.Aggregate(Money.Zero(), (sum, t) => sum + t.PnL)
-            : Money.Zero();
-
-        var winCount = allTrades.Count(t => t.PnL.Amount > 0);
-        var winRate = allTrades.Count > 0 ? (decimal)winCount / allTrades.Count : 0m;
+        var (totalPnL, winRate) = TradeStatsCalculator.Calculate(allTrades);
 
         var bestTrade = allTrades.Count > 0
             ? allTrades.MaxBy(t => t.PnL.Amount)!.PnL

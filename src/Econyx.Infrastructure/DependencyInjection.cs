@@ -113,11 +113,9 @@ public static class DependencyInjection
 
         services.AddSingleton(new AiResponseCache(TimeSpan.FromMinutes(aiOptions.CacheDurationMinutes)));
 
-        // Anthropic direct API
         services.AddSingleton<AnthropicClient>(_ => new AnthropicClient());
         services.AddSingleton<ClaudeAnalysisService>();
 
-        // OpenAI direct API -- keyed to avoid collision with OpenRouter's IChatClient
         services.AddKeyedSingleton<IChatClient>("openai-direct", (sp, _) =>
         {
             var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? string.Empty;
@@ -131,7 +129,6 @@ public static class DependencyInjection
                 sp.GetRequiredService<AiResponseCache>(),
                 sp.GetRequiredService<ILogger<OpenAiAnalysisService>>()));
 
-        // OpenRouter gateway -- uses OpenAI-compatible endpoint
         services.AddHttpClient<IOpenRouterClient, OpenRouterHttpClient>(client =>
         {
             client.BaseAddress = new Uri(aiOptions.OpenRouter.BaseUrl.TrimEnd('/') + "/");
@@ -158,7 +155,6 @@ public static class DependencyInjection
                 sp.GetRequiredService<AiResponseCache>(),
                 sp.GetRequiredService<ILogger<OpenRouterAnalysisService>>()));
 
-        // Factory -- resolves the active provider at runtime
         services.AddSingleton<IAiProviderFactory, AiProviderFactory>();
     }
 
@@ -174,28 +170,28 @@ public static class DependencyInjection
         }
         else
         {
-            services.AddSingleton<ISecretManager, DpapiSecretManager>();
+            services.AddSingleton<ISecretManager, ConfigurationSecretManager>();
         }
     }
 }
 
 internal static partial class MigrationLog
 {
-    [LoggerMessage(Level = LogLevel.Information, Message = "Veritabani migration kontrolu yapiliyor...")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Checking database migrations...")]
     public static partial void CheckingMigrations(ILogger logger);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Count} bekleyen migration bulundu, uygulaniyor...")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Count} pending migrations found, applying...")]
     public static partial void PendingMigrationsFound(ILogger logger, int count);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Migration basariyla tamamlandi.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Migrations applied successfully.")]
     public static partial void MigrationCompleted(ILogger logger);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Veritabani guncel, bekleyen migration yok.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Database is up to date, no pending migrations.")]
     public static partial void DatabaseUpToDate(ILogger logger);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Migration sirasinda hata olustu. EnsureCreated deneniyor...")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Error during migration. Trying EnsureCreated...")]
     public static partial void MigrationFailed(ILogger logger, Exception ex);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Veritabani EnsureCreated ile olusturuldu.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Database created via EnsureCreated.")]
     public static partial void DatabaseCreated(ILogger logger);
 }

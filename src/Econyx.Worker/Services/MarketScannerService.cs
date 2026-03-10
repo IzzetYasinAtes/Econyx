@@ -31,7 +31,7 @@ public sealed class MarketScannerService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation(
-            "MarketScannerService başlatıldı — tarama aralığı: {Interval} dk, mod: {Mode}",
+            "MarketScannerService started — scan interval: {Interval} min, mode: {Mode}",
             _tradingOptions.ScanIntervalMinutes,
             _tradingOptions.Mode);
 
@@ -50,7 +50,7 @@ public sealed class MarketScannerService : BackgroundService
                 var result = await mediator.Send(new ScanMarketsCommand(), stoppingToken);
 
                 _logger.LogInformation(
-                    "Döngü #{Cycle} — {Scanned} pazar tarandı, {Signals} sinyal bulundu, süre: {Duration:N0}ms",
+                    "Cycle #{Cycle} — {Scanned} markets scanned, {Signals} signals found, duration: {Duration:N0}ms",
                     cycle, result.MarketsScanned, result.Signals.Count, sw.ElapsedMilliseconds);
 
                 if (result.Signals.Count > 0)
@@ -62,7 +62,7 @@ public sealed class MarketScannerService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Döngü #{Cycle} tarama sırasında hata oluştu", cycle);
+                _logger.LogError(ex, "Error during scan cycle #{Cycle}", cycle);
             }
 
             sw.Stop();
@@ -87,7 +87,7 @@ public sealed class MarketScannerService : BackgroundService
 
         if (availableSlots <= 0)
         {
-            _logger.LogInformation("Maksimum açık pozisyon sayısına ulaşıldı ({Max}), yeni emir verilmiyor",
+            _logger.LogInformation("Maximum open position limit reached ({Max}), skipping new orders",
                 _tradingOptions.MaxOpenPositions);
             return;
         }
@@ -106,7 +106,7 @@ public sealed class MarketScannerService : BackgroundService
 
                 if (positionSize.Amount <= 0)
                 {
-                    _logger.LogDebug("Sinyal {Market} için pozisyon boyutu sıfır, atlanıyor", signal.MarketQuestion);
+                    _logger.LogDebug("Position size is zero for signal {Market}, skipping", signal.MarketQuestion);
                     continue;
                 }
 
@@ -116,19 +116,19 @@ public sealed class MarketScannerService : BackgroundService
                 if (result.IsSuccess)
                 {
                     _logger.LogInformation(
-                        "Emir verildi — pazar: {Market}, boyut: {Size}, yön: {Side}",
+                        "Order placed — market: {Market}, size: {Size}, side: {Side}",
                         signal.MarketQuestion, positionSize, signal.RecommendedSide);
                 }
                 else
                 {
                     _logger.LogWarning(
-                        "Emir başarısız — pazar: {Market}, hata: {Error}",
+                        "Order failed — market: {Market}, error: {Error}",
                         signal.MarketQuestion, result.Error);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Sinyal işlenirken hata: {Market}", signal.MarketQuestion);
+                _logger.LogError(ex, "Error processing signal: {Market}", signal.MarketQuestion);
             }
         }
     }

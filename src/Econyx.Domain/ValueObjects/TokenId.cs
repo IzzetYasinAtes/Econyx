@@ -6,7 +6,7 @@ public sealed class TokenId : ValueObject
 {
     public string Value { get; }
 
-    #pragma warning disable CS8618 // EF Core requires parameterless constructor for owned types
+    #pragma warning disable CS8618
     private TokenId() { }
     #pragma warning restore CS8618
     private TokenId(string value) => Value = value;

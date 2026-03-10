@@ -34,23 +34,12 @@ internal sealed class TradeConfiguration : IEntityTypeConfiguration<Trade>
             .HasMaxLength(50)
             .IsRequired();
 
-        builder.OwnsOne(t => t.EntryPrice, ConfigureMoney("Entry"));
-        builder.OwnsOne(t => t.ExitPrice, ConfigureMoney("Exit"));
-        builder.OwnsOne(t => t.PnL, ConfigureMoney("PnL"));
-        builder.OwnsOne(t => t.Fees, ConfigureMoney("Fee"));
+        builder.OwnsOne(t => t.EntryPrice, b => b.ConfigureMoney("Entry"));
+        builder.OwnsOne(t => t.ExitPrice, b => b.ConfigureMoney("Exit"));
+        builder.OwnsOne(t => t.PnL, b => b.ConfigureMoney("PnL"));
+        builder.OwnsOne(t => t.Fees, b => b.ConfigureMoney("Fee"));
 
         builder.HasIndex(t => t.MarketId);
         builder.HasIndex(t => t.ClosedAt);
     }
-
-    private static Action<OwnedNavigationBuilder<Trade, Money>> ConfigureMoney(string prefix)
-        => mb =>
-        {
-            mb.Property(m => m.Amount)
-                .HasColumnName($"{prefix}Amount")
-                .HasPrecision(18, 6);
-            mb.Property(m => m.Currency)
-                .HasColumnName($"{prefix}Currency")
-                .HasMaxLength(10);
-        };
 }

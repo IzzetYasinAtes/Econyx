@@ -24,21 +24,10 @@ internal sealed class BalanceSnapshotConfiguration : IEntityTypeConfiguration<Ba
             .HasMaxLength(20)
             .IsRequired();
 
-        builder.OwnsOne(b => b.Balance, ConfigureMoney("Balance"));
-        builder.OwnsOne(b => b.TotalPnL, ConfigureMoney("TotalPnL"));
-        builder.OwnsOne(b => b.ApiCosts, ConfigureMoney("ApiCosts"));
+        builder.OwnsOne(b => b.Balance, b => b.ConfigureMoney("Balance"));
+        builder.OwnsOne(b => b.TotalPnL, b => b.ConfigureMoney("TotalPnL"));
+        builder.OwnsOne(b => b.ApiCosts, b => b.ConfigureMoney("ApiCosts"));
 
         builder.HasIndex(b => b.CreatedAt);
     }
-
-    private static Action<OwnedNavigationBuilder<BalanceSnapshot, Money>> ConfigureMoney(string prefix)
-        => mb =>
-        {
-            mb.Property(m => m.Amount)
-                .HasColumnName($"{prefix}Amount")
-                .HasPrecision(18, 6);
-            mb.Property(m => m.Currency)
-                .HasColumnName($"{prefix}Currency")
-                .HasMaxLength(10);
-        };
 }

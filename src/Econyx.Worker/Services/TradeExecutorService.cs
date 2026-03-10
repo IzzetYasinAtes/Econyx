@@ -23,7 +23,7 @@ public sealed class TradeExecutorService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("TradeExecutorService başlatıldı — kontrol aralığı: {Interval}s", CheckInterval.TotalSeconds);
+        _logger.LogInformation("TradeExecutorService started — check interval: {Interval}s", CheckInterval.TotalSeconds);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -37,7 +37,7 @@ public sealed class TradeExecutorService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Bekleyen emirler kontrol edilirken hata oluştu");
+                _logger.LogError(ex, "Error checking pending orders");
             }
 
             await Task.Delay(CheckInterval, stoppingToken);
@@ -56,7 +56,7 @@ public sealed class TradeExecutorService : BackgroundService
         if (pendingOrders.Count == 0)
             return;
 
-        _logger.LogDebug("{Count} bekleyen emir kontrol ediliyor", pendingOrders.Count);
+        _logger.LogDebug("Checking {Count} pending orders", pendingOrders.Count);
 
         foreach (var order in pendingOrders)
         {
@@ -67,19 +67,18 @@ public sealed class TradeExecutorService : BackgroundService
 
                 var currentPrice = await platform.GetPriceAsync(order.PlatformOrderId, ct);
 
-                // Paper modda emir hemen doldurulmuş sayılır
                 if (order.Mode == TradingMode.Paper && order.Status == OrderStatus.Pending)
                 {
                     order.Fill(order.Price, order.Quantity);
 
                     _logger.LogInformation(
-                        "Emir dolduruldu (Paper) — OrderId: {OrderId}, Fiyat: {Price}, Miktar: {Quantity}",
+                        "Order filled (Paper) — OrderId: {OrderId}, Price: {Price}, Quantity: {Quantity}",
                         order.Id, order.Price, order.Quantity);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Emir durumu kontrol edilirken hata — OrderId: {OrderId}", order.Id);
+                _logger.LogWarning(ex, "Error checking order status — OrderId: {OrderId}", order.Id);
             }
         }
 

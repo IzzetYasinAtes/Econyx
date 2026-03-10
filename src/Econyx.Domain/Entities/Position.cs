@@ -1,6 +1,7 @@
 using Econyx.Core.Entities;
 using Econyx.Domain.Enums;
 using Econyx.Domain.Events;
+using Econyx.Domain.Services;
 using Econyx.Domain.ValueObjects;
 
 namespace Econyx.Domain.Entities;
@@ -79,12 +80,6 @@ public sealed class Position : AggregateRoot<Guid>
         RaiseDomainEvent(new PositionClosedEvent(Id, MarketId, CalculatePnL(), StrategyName));
     }
 
-    public Money CalculatePnL()
-    {
-        var price = ExitPrice ?? CurrentPrice;
-
-        return Side == TradeSide.Yes
-            ? (price - EntryPrice) * Quantity
-            : (EntryPrice - price) * Quantity;
-    }
+    public Money CalculatePnL() =>
+        PnLCalculator.CalculateUnrealizedPnL(EntryPrice, ExitPrice ?? CurrentPrice, Quantity, Side);
 }

@@ -36,7 +36,7 @@ else
                        Value="@FormatMoney(_stats.Balance)"
                        SubText="@($"initial: ${_initialBalance:F2}")" />
             <StatsCard Title="TOTAL PnL"
-                       Value="@FormatPnL(_stats.TotalPnL)"
+                       Value="@FormatMoneyPnL(_stats.TotalPnL)"
                        ValueColor="@PnLColor(_stats.TotalPnL.Amount)"
                        SubText="@FormatPnLPercent()" />
             <StatsCard Title="API COSTS PAID"
@@ -141,8 +141,7 @@ else
 
     private static string FormatMoney(Money m) => $"${m.Amount:F2}";
 
-    private static string FormatPnL(Money pnl) =>
-        pnl.Amount >= 0 ? $"+${pnl.Amount:F2}" : $"-${Math.Abs(pnl.Amount):F2}";
+    private static string FormatMoneyPnL(Money pnl) => FormatPnL(pnl.Amount);
 
     private string FormatPnLPercent()
     {
