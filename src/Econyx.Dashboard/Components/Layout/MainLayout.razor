@@ -1,7 +1,9 @@
 @inherits LayoutComponentBase
-@inject AppLocalizer L
+@implements IDisposable
+@using System.Globalization
+@inject IStringLocalizer<SharedResource> L
 @inject NavigationManager Nav
-@inject IJSRuntime JS
+@inject PersistentComponentState PersistState
 
 <div class="econyx-root">
     <nav class="econyx-nav">
@@ -9,7 +11,8 @@
         <NavLink class="nav-item" href="positions">@L["Nav_Positions"]</NavLink>
         <NavLink class="nav-item" href="trades">@L["Nav_Trades"]</NavLink>
         <NavLink class="nav-item" href="settings">@L["Nav_Settings"]</NavLink>
-        <select class="lang-select" value="@L.Culture" @onchange="OnCultureChanged">
+        <select class="lang-select" value="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName"
+                @onchange="OnCultureChanged">
             <option value="en">EN</option>
             <option value="tr">TR</option>
         </select>
@@ -27,22 +30,30 @@
 </div>
 
 @code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private PersistingComponentStateSubscription _subscription;
+
+    protected override void OnInitialized()
     {
-        if (!firstRender) return;
-        var saved = await JS.InvokeAsync<string?>("localStorage.getItem", "econyx-lang");
-        if (!string.IsNullOrEmpty(saved) && saved != L.Culture)
+        if (PersistState.TryTakeFromJson<string>("culture", out var culture) && !string.IsNullOrEmpty(culture))
         {
-            L.SetCulture(saved);
-            StateHasChanged();
+            var ci = CultureInfo.GetCultureInfo(culture);
+            CultureInfo.CurrentCulture = ci;
+            CultureInfo.CurrentUICulture = ci;
         }
+
+        _subscription = PersistState.RegisterOnPersisting(() =>
+        {
+            PersistState.PersistAsJson("culture", CultureInfo.CurrentUICulture.Name);
+            return Task.CompletedTask;
+        });
     }
 
-    private async Task OnCultureChanged(ChangeEventArgs e)
+    private void OnCultureChanged(ChangeEventArgs e)
     {
         var culture = e.Value?.ToString() ?? "en";
-        L.SetCulture(culture);
-        await JS.InvokeVoidAsync("localStorage.setItem", "econyx-lang", culture);
-        Nav.NavigateTo(Nav.Uri, forceLoad: true);
+        var uri = new Uri(Nav.Uri).PathAndQuery;
+        Nav.NavigateTo($"Culture/Set?culture={culture}&returnUrl={Uri.EscapeDataString(uri)}", forceLoad: true);
     }
+
+    public void Dispose() => _subscription.Dispose();
 }

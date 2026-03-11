@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Nav_Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="Nav_Positions" xml:space="preserve">
+    <value>Positions</value>
+  </data>
+  <data name="Nav_Trades" xml:space="preserve">
+    <value>Trades</value>
+  </data>
+  <data name="Nav_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Saving" xml:space="preserve">
+    <value>SAVING...</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>SAVED</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>REFRESH</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Free" xml:space="preserve">
+    <value>FREE</value>
+  </data>
+  <data name="Prev" xml:space="preserve">
+    <value>&lt; PREV</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>NEXT &gt;</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>days</value>
+  </data>
+  <data name="Error_Unhandled" xml:space="preserve">
+    <value>An unhandled error has occurred.</value>
+  </data>
+  <data name="Reload" xml:space="preserve">
+    <value>Reload</value>
+  </data>
+  <data name="Home_Title" xml:space="preserve">
+    <value>Econyx Dashboard</value>
+  </data>
+  <data name="Home_Agent" xml:space="preserve">
+    <value>ECONYX AGENT</value>
+  </data>
+  <data name="Home_SurvivalMode" xml:space="preserve">
+    <value>SURVIVAL MODE</value>
+  </data>
+  <data name="Home_Alive" xml:space="preserve">
+    <value>ALIVE</value>
+  </data>
+  <data name="Home_Uptime" xml:space="preserve">
+    <value>UPTIME</value>
+  </data>
+  <data name="Home_Cycle" xml:space="preserve">
+    <value>CYCLE</value>
+  </data>
+  <data name="Home_CurrentBalance" xml:space="preserve">
+    <value>CURRENT BALANCE</value>
+  </data>
+  <data name="Home_TotalPnl" xml:space="preserve">
+    <value>TOTAL PnL</value>
+  </data>
+  <data name="Home_ApiCostsPaid" xml:space="preserve">
+    <value>API COSTS PAID</value>
+  </data>
+  <data name="Home_SelfFunded" xml:space="preserve">
+    <value>self-funded inference</value>
+  </data>
+  <data name="Home_WinRate" xml:space="preserve">
+    <value>WIN RATE</value>
+  </data>
+  <data name="Home_BalanceHistory" xml:space="preserve">
+    <value>BALANCE HISTORY (LOG SCALE)</value>
+  </data>
+  <data name="Home_ChartPlaceholder" xml:space="preserve">
+    <value>Chart will render with live data</value>
+  </data>
+  <data name="Home_DailyApiCost" xml:space="preserve">
+    <value>Daily API Cost</value>
+  </data>
+  <data name="Home_Runway" xml:space="preserve">
+    <value>Runway</value>
+  </data>
+  <data name="Home_Trades" xml:space="preserve">
+    <value>Trades</value>
+  </data>
+  <data name="Home_MarketsScanned" xml:space="preserve">
+    <value>Markets Scanned</value>
+  </data>
+  <data name="Home_OpenPositions" xml:space="preserve">
+    <value>Open Positions</value>
+  </data>
+  <data name="Home_BestTrade" xml:space="preserve">
+    <value>Best Trade</value>
+  </data>
+  <data name="Home_WorstTrade" xml:space="preserve">
+    <value>Worst Trade</value>
+  </data>
+  <data name="Home_SharpeRatio" xml:space="preserve">
+    <value>Sharpe Ratio</value>
+  </data>
+  <data name="Home_AvgEdge" xml:space="preserve">
+    <value>Avg Edge</value>
+  </data>
+  <data name="Home_DataLoaded" xml:space="preserve">
+    <value>Dashboard data loaded</value>
+  </data>
+  <data name="Trades_Title" xml:space="preserve">
+    <value>Trades — Econyx</value>
+  </data>
+  <data name="Trades_Header" xml:space="preserve">
+    <value>TRADE HISTORY</value>
+  </data>
+  <data name="Trades_TotalCount" xml:space="preserve">
+    <value>{0} total trades</value>
+  </data>
+  <data name="Trades_Empty" xml:space="preserve">
+    <value>No trades yet</value>
+  </data>
+  <data name="Trades_Market" xml:space="preserve">
+    <value>Market</value>
+  </data>
+  <data name="Trades_Side" xml:space="preserve">
+    <value>Side</value>
+  </data>
+  <data name="Trades_Entry" xml:space="preserve">
+    <value>Entry</value>
+  </data>
+  <data name="Trades_Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="Trades_Qty" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="Trades_PnL" xml:space="preserve">
+    <value>PnL</value>
+  </data>
+  <data name="Trades_Duration" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+  <data name="Trades_Strategy" xml:space="preserve">
+    <value>Strategy</value>
+  </data>
+  <data name="Trades_Closed" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="Positions_Title" xml:space="preserve">
+    <value>Positions — Econyx</value>
+  </data>
+  <data name="Positions_Header" xml:space="preserve">
+    <value>OPEN POSITIONS</value>
+  </data>
+  <data name="Positions_Empty" xml:space="preserve">
+    <value>No open positions</value>
+  </data>
+  <data name="Positions_Current" xml:space="preserve">
+    <value>Current</value>
+  </data>
+  <data name="Positions_Opened" xml:space="preserve">
+    <value>Opened</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Settings — Econyx</value>
+  </data>
+  <data name="Settings_Header" xml:space="preserve">
+    <value>CONFIGURATION</value>
+  </data>
+  <data name="Settings_ActiveModel" xml:space="preserve">
+    <value>ACTIVE MODEL</value>
+  </data>
+  <data name="Settings_SelectModel" xml:space="preserve">
+    <value>SELECT MODEL</value>
+  </data>
+  <data name="Settings_SearchModels" xml:space="preserve">
+    <value>Search models...</value>
+  </data>
+  <data name="Settings_NoModels" xml:space="preserve">
+    <value>No models found</value>
+  </data>
+  <data name="Settings_MaxTokens" xml:space="preserve">
+    <value>MAX TOKENS</value>
+  </data>
+  <data name="Settings_ApiKeys" xml:space="preserve">
+    <value>API KEYS</value>
+  </data>
+  <data name="Settings_Trading" xml:space="preserve">
+    <value>TRADING</value>
+  </data>
+  <data name="Settings_Platform" xml:space="preserve">
+    <value>PLATFORM</value>
+  </data>
+  <data name="Settings_Mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="Settings_InitialBalance" xml:space="preserve">
+    <value>Initial Balance</value>
+  </data>
+  <data name="Settings_ScanInterval" xml:space="preserve">
+    <value>Scan Interval</value>
+  </data>
+  <data name="Settings_MaxPositions" xml:space="preserve">
+    <value>Max Positions</value>
+  </data>
+  <data name="Settings_PositionSize" xml:space="preserve">
+    <value>Position Size</value>
+  </data>
+  <data name="Settings_MinEdge" xml:space="preserve">
+    <value>Min Edge</value>
+  </data>
+  <data name="Settings_MinVolume" xml:space="preserve">
+    <value>Min Volume</value>
+  </data>
+  <data name="Settings_MaxSpread" xml:space="preserve">
+    <value>Max Spread</value>
+  </data>
+  <data name="Settings_StopLoss" xml:space="preserve">
+    <value>Stop Loss</value>
+  </data>
+  <data name="Settings_TakeProfit" xml:space="preserve">
+    <value>Take Profit</value>
+  </data>
+  <data name="Settings_Survival" xml:space="preserve">
+    <value>Survival</value>
+  </data>
+</root>

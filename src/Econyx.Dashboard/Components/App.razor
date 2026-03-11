@@ -1,5 +1,9 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Components.Web
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@_cultureName">
 
 <head>
     <meta charset="utf-8" />
@@ -19,3 +23,25 @@
 </body>
 
 </html>
+
+@code {
+    private string _cultureName = "en";
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (HttpContext is null) return;
+        var feature = HttpContext.Features.Get<IRequestCultureFeature>();
+        if (feature is null) return;
+
+        var culture = feature.RequestCulture.UICulture;
+        _cultureName = culture.Name;
+
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+    }
+}

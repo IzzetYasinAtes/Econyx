@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Nav_Dashboard" xml:space="preserve">
+    <value>Panel</value>
+  </data>
+  <data name="Nav_Positions" xml:space="preserve">
+    <value>Pozisyonlar</value>
+  </data>
+  <data name="Nav_Trades" xml:space="preserve">
+    <value>İşlemler</value>
+  </data>
+  <data name="Nav_Settings" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Yükleniyor...</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="Saving" xml:space="preserve">
+    <value>KAYDEDİLİYOR...</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>KAYDEDİLDİ</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>YENİLE</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>Yok</value>
+  </data>
+  <data name="Free" xml:space="preserve">
+    <value>ÜCRETSİZ</value>
+  </data>
+  <data name="Prev" xml:space="preserve">
+    <value>&lt; ÖNCEKİ</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>SONRAKİ &gt;</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>gün</value>
+  </data>
+  <data name="Error_Unhandled" xml:space="preserve">
+    <value>Beklenmeyen bir hata oluştu.</value>
+  </data>
+  <data name="Reload" xml:space="preserve">
+    <value>Yeniden Yükle</value>
+  </data>
+  <data name="Home_Title" xml:space="preserve">
+    <value>Econyx Panel</value>
+  </data>
+  <data name="Home_Agent" xml:space="preserve">
+    <value>ECONYX AJAN</value>
+  </data>
+  <data name="Home_SurvivalMode" xml:space="preserve">
+    <value>HAYATTA KALMA MODU</value>
+  </data>
+  <data name="Home_Alive" xml:space="preserve">
+    <value>AKTİF</value>
+  </data>
+  <data name="Home_Uptime" xml:space="preserve">
+    <value>ÇALIŞMA SÜRESİ</value>
+  </data>
+  <data name="Home_Cycle" xml:space="preserve">
+    <value>DÖNGÜ</value>
+  </data>
+  <data name="Home_CurrentBalance" xml:space="preserve">
+    <value>MEVCUT BAKİYE</value>
+  </data>
+  <data name="Home_TotalPnl" xml:space="preserve">
+    <value>TOPLAM KÂR/ZARAR</value>
+  </data>
+  <data name="Home_ApiCostsPaid" xml:space="preserve">
+    <value>API MALİYETLERİ</value>
+  </data>
+  <data name="Home_SelfFunded" xml:space="preserve">
+    <value>kendi fonlu çıkarım</value>
+  </data>
+  <data name="Home_WinRate" xml:space="preserve">
+    <value>KAZANMA ORANI</value>
+  </data>
+  <data name="Home_BalanceHistory" xml:space="preserve">
+    <value>BAKİYE GEÇMİŞİ (LOG ÖLÇEĞİ)</value>
+  </data>
+  <data name="Home_ChartPlaceholder" xml:space="preserve">
+    <value>Grafik canlı veriyle oluşturulacak</value>
+  </data>
+  <data name="Home_DailyApiCost" xml:space="preserve">
+    <value>Günlük API Maliyeti</value>
+  </data>
+  <data name="Home_Runway" xml:space="preserve">
+    <value>Kalan Süre</value>
+  </data>
+  <data name="Home_Trades" xml:space="preserve">
+    <value>İşlemler</value>
+  </data>
+  <data name="Home_MarketsScanned" xml:space="preserve">
+    <value>Taranan Pazarlar</value>
+  </data>
+  <data name="Home_OpenPositions" xml:space="preserve">
+    <value>Açık Pozisyonlar</value>
+  </data>
+  <data name="Home_BestTrade" xml:space="preserve">
+    <value>En İyi İşlem</value>
+  </data>
+  <data name="Home_WorstTrade" xml:space="preserve">
+    <value>En Kötü İşlem</value>
+  </data>
+  <data name="Home_SharpeRatio" xml:space="preserve">
+    <value>Sharpe Oranı</value>
+  </data>
+  <data name="Home_AvgEdge" xml:space="preserve">
+    <value>Ort. Avantaj</value>
+  </data>
+  <data name="Home_DataLoaded" xml:space="preserve">
+    <value>Panel verileri yüklendi</value>
+  </data>
+  <data name="Trades_Title" xml:space="preserve">
+    <value>İşlemler — Econyx</value>
+  </data>
+  <data name="Trades_Header" xml:space="preserve">
+    <value>İŞLEM GEÇMİŞİ</value>
+  </data>
+  <data name="Trades_TotalCount" xml:space="preserve">
+    <value>toplam {0} işlem</value>
+  </data>
+  <data name="Trades_Empty" xml:space="preserve">
+    <value>Henüz işlem yok</value>
+  </data>
+  <data name="Trades_Market" xml:space="preserve">
+    <value>Pazar</value>
+  </data>
+  <data name="Trades_Side" xml:space="preserve">
+    <value>Yön</value>
+  </data>
+  <data name="Trades_Entry" xml:space="preserve">
+    <value>Giriş</value>
+  </data>
+  <data name="Trades_Exit" xml:space="preserve">
+    <value>Çıkış</value>
+  </data>
+  <data name="Trades_Qty" xml:space="preserve">
+    <value>Miktar</value>
+  </data>
+  <data name="Trades_PnL" xml:space="preserve">
+    <value>Kâr/Zarar</value>
+  </data>
+  <data name="Trades_Duration" xml:space="preserve">
+    <value>Süre</value>
+  </data>
+  <data name="Trades_Strategy" xml:space="preserve">
+    <value>Strateji</value>
+  </data>
+  <data name="Trades_Closed" xml:space="preserve">
+    <value>Kapanış</value>
+  </data>
+  <data name="Positions_Title" xml:space="preserve">
+    <value>Pozisyonlar — Econyx</value>
+  </data>
+  <data name="Positions_Header" xml:space="preserve">
+    <value>AÇIK POZİSYONLAR</value>
+  </data>
+  <data name="Positions_Empty" xml:space="preserve">
+    <value>Açık pozisyon yok</value>
+  </data>
+  <data name="Positions_Current" xml:space="preserve">
+    <value>Güncel</value>
+  </data>
+  <data name="Positions_Opened" xml:space="preserve">
+    <value>Açılış</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Ayarlar — Econyx</value>
+  </data>
+  <data name="Settings_Header" xml:space="preserve">
+    <value>YAPILANDIRMA</value>
+  </data>
+  <data name="Settings_ActiveModel" xml:space="preserve">
+    <value>AKTİF MODEL</value>
+  </data>
+  <data name="Settings_SelectModel" xml:space="preserve">
+    <value>MODEL SEÇ</value>
+  </data>
+  <data name="Settings_SearchModels" xml:space="preserve">
+    <value>Model ara...</value>
+  </data>
+  <data name="Settings_NoModels" xml:space="preserve">
+    <value>Model bulunamadı</value>
+  </data>
+  <data name="Settings_MaxTokens" xml:space="preserve">
+    <value>MAKSİMUM TOKEN</value>
+  </data>
+  <data name="Settings_ApiKeys" xml:space="preserve">
+    <value>API ANAHTARLARI</value>
+  </data>
+  <data name="Settings_Trading" xml:space="preserve">
+    <value>İŞLEM</value>
+  </data>
+  <data name="Settings_Platform" xml:space="preserve">
+    <value>PLATFORM</value>
+  </data>
+  <data name="Settings_Mode" xml:space="preserve">
+    <value>Mod</value>
+  </data>
+  <data name="Settings_InitialBalance" xml:space="preserve">
+    <value>Başlangıç Bakiyesi</value>
+  </data>
+  <data name="Settings_ScanInterval" xml:space="preserve">
+    <value>Tarama Aralığı</value>
+  </data>
+  <data name="Settings_MaxPositions" xml:space="preserve">
+    <value>Maks Pozisyon</value>
+  </data>
+  <data name="Settings_PositionSize" xml:space="preserve">
+    <value>Pozisyon Boyutu</value>
+  </data>
+  <data name="Settings_MinEdge" xml:space="preserve">
+    <value>Min Avantaj</value>
+  </data>
+  <data name="Settings_MinVolume" xml:space="preserve">
+    <value>Min Hacim</value>
+  </data>
+  <data name="Settings_MaxSpread" xml:space="preserve">
+    <value>Maks Spread</value>
+  </data>
+  <data name="Settings_StopLoss" xml:space="preserve">
+    <value>Zarar Durdur</value>
+  </data>
+  <data name="Settings_TakeProfit" xml:space="preserve">
+    <value>Kâr Al</value>
+  </data>
+  <data name="Settings_Survival" xml:space="preserve">
+    <value>Hayatta Kalma</value>
+  </data>
+</root>

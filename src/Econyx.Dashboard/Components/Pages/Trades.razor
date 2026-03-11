@@ -1,6 +1,6 @@
 @page "/trades"
 @inject IMediator Mediator
-@inject AppLocalizer L
+@inject IStringLocalizer<SharedResource> L
 
 <PageTitle>@L["Trades_Title"]</PageTitle>
 
@@ -9,7 +9,7 @@
     <span class="text-muted mono" style="font-size: 0.75rem;">
         @if (_history is not null)
         {
-            @L.Format("Trades_TotalCount", _history.TotalCount)
+            @string.Format(System.Globalization.CultureInfo.InvariantCulture, L["Trades_TotalCount"], _history.TotalCount)
         }
     </span>
 </div>

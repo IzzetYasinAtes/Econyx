@@ -1,10 +1,11 @@
 using System.Globalization;
 using Econyx.Application;
 using Econyx.Application.Configuration;
+using Econyx.Dashboard;
 using Econyx.Dashboard.Components;
 using Econyx.Dashboard.Hubs;
-using Econyx.Dashboard.Services;
 using Econyx.Infrastructure;
+using Microsoft.AspNetCore.Localization;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -39,7 +40,18 @@ try
         builder.Configuration.GetSection(PlatformOptions.SectionName));
 
     builder.Services.AddSignalR();
-    builder.Services.AddScoped<AppLocalizer>();
+    builder.Services.AddLocalization(opts => opts.ResourcesPath = "Resources");
+    builder.Services.AddControllers();
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler, CultureCircuitHandler>();
+
+    builder.Services.Configure<RequestLocalizationOptions>(opts =>
+    {
+        var supported = new[] { new CultureInfo("en"), new CultureInfo("tr") };
+        opts.DefaultRequestCulture = new RequestCulture("en");
+        opts.SupportedCultures = supported;
+        opts.SupportedUICultures = supported;
+    });
 
     var app = builder.Build();
 
@@ -49,10 +61,12 @@ try
         app.UseHsts();
     }
 
+    app.UseRequestLocalization();
     app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
     app.UseHttpsRedirection();
     app.UseAntiforgery();
     app.MapStaticAssets();
+    app.MapControllers();
 
     app.MapHub<TradingHub>("/tradinghub");
 
