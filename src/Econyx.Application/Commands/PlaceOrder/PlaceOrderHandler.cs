@@ -13,15 +13,18 @@ public sealed class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Resul
 {
     private readonly IPlatformAdapter _platform;
     private readonly IOrderRepository _orderRepository;
+    private readonly IPositionRepository _positionRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public PlaceOrderHandler(
         IPlatformAdapter platform,
         IOrderRepository orderRepository,
+        IPositionRepository positionRepository,
         IUnitOfWork unitOfWork)
     {
         _platform = platform;
         _orderRepository = orderRepository;
+        _positionRepository = positionRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -44,13 +47,14 @@ public sealed class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Resul
             {
                 var platformOrderId = await _platform.PlaceOrderAsync(
                     new PlaceOrderRequest(
-                        string.Empty,
+                        signal.TokenId,
                         signal.RecommendedSide,
                         signal.MarketPrice.Value,
                         order.Quantity,
                         OrderType.Limit),
                     cancellationToken);
 
+                order.SetPlatformOrderId(platformOrderId);
                 order.Fill(Money.Create(signal.MarketPrice.Value), order.Quantity);
             }
             catch (Exception ex)
@@ -66,9 +70,19 @@ public sealed class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Resul
             order.Fill(Money.Create(signal.MarketPrice.Value), order.Quantity);
         }
 
+        var position = Position.Create(
+            signal.MarketId,
+            signal.MarketQuestion,
+            _platform.Platform,
+            signal.RecommendedSide,
+            Money.Create(signal.MarketPrice.Value),
+            order.Quantity,
+            signal.StrategyName);
+
         await _orderRepository.AddAsync(order, cancellationToken);
+        await _positionRepository.AddAsync(position, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(order.Id);
+        return Result.Success(position.Id);
     }
 }

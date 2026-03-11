@@ -84,6 +84,13 @@ public sealed class Order : BaseEntity<Guid>
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public void SetPlatformOrderId(string platformOrderId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(platformOrderId);
+        PlatformOrderId = platformOrderId;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
     public void Reject(string reason)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(reason);

@@ -37,19 +37,15 @@ public sealed class HybridStrategy : IStrategy
                 r.MarketId == aiSignal.MarketId &&
                 r.RecommendedSide == aiSignal.RecommendedSide);
 
-            if (matchingRule is not null)
+            if (matchingRule is null)
+                continue;
+
+            combined.Add(aiSignal with
             {
-                combined.Add(aiSignal with
-                {
-                    StrategyName = Name,
-                    Confidence = (matchingRule.Confidence + aiSignal.Confidence) / 2m,
-                    Reasoning = $"[Rule] {matchingRule.Reasoning} | [AI] {aiSignal.Reasoning}"
-                });
-            }
-            else
-            {
-                combined.Add(aiSignal with { StrategyName = Name });
-            }
+                StrategyName = Name,
+                Confidence = (matchingRule.Confidence + aiSignal.Confidence) / 2m,
+                Reasoning = $"[Rule] {matchingRule.Reasoning} | [AI] {aiSignal.Reasoning}"
+            });
         }
 
         return combined;

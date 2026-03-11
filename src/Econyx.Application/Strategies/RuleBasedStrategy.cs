@@ -45,6 +45,7 @@ public sealed class RuleBasedStrategy : IStrategy
                         signals.Add(new StrategySignal(
                             market.Id,
                             market.Question,
+                            outcome.Token.Value,
                             TradeSide.Yes,
                             Edge.Create(buyEdge),
                             Probability.Create(0.15m),
@@ -63,6 +64,7 @@ public sealed class RuleBasedStrategy : IStrategy
                         signals.Add(new StrategySignal(
                             market.Id,
                             market.Question,
+                            outcome.Token.Value,
                             TradeSide.No,
                             Edge.Create(sellEdge),
                             Probability.Create(0.85m),

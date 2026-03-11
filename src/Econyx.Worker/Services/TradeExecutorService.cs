@@ -62,18 +62,14 @@ public sealed class TradeExecutorService : BackgroundService
         {
             try
             {
-                if (string.IsNullOrEmpty(order.PlatformOrderId))
-                    continue;
-
-                var currentPrice = await platform.GetPriceAsync(order.PlatformOrderId, ct);
-
-                if (order.Mode == TradingMode.Paper && order.Status == OrderStatus.Pending)
+                if (order.Mode == TradingMode.Live && !string.IsNullOrEmpty(order.PlatformOrderId))
                 {
-                    order.Fill(order.Price, order.Quantity);
+                    var currentPrice = await platform.GetPriceAsync(order.PlatformOrderId, ct);
+                    order.Fill(Money.Create(currentPrice.Value), order.Quantity);
 
                     _logger.LogInformation(
-                        "Order filled (Paper) — OrderId: {OrderId}, Price: {Price}, Quantity: {Quantity}",
-                        order.Id, order.Price, order.Quantity);
+                        "Order filled (Live) — OrderId: {OrderId}, Price: {Price}",
+                        order.Id, currentPrice);
                 }
             }
             catch (Exception ex)

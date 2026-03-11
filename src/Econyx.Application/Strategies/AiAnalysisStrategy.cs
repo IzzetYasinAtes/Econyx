@@ -64,6 +64,7 @@ public sealed class AiAnalysisStrategy : IStrategy
                 signals.Add(new StrategySignal(
                     market.Id,
                     market.Question,
+                    marketOutcome.Token.Value,
                     side,
                     edge,
                     outcome.FairValue,

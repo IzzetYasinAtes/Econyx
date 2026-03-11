@@ -39,8 +39,9 @@ public sealed class GetMarketAnalysisHandler : IRequestHandler<GetMarketAnalysis
             var aiService = await _providerFactory.GetProviderAsync(cancellationToken);
             aiResult = await aiService.AnalyzeMarketAsync(analysisRequest, cancellationToken);
         }
-        catch
+        catch (Exception)
         {
+            return null;
         }
 
         var outcomes = market.Outcomes

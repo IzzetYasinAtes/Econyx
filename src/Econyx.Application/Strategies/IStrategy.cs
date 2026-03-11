@@ -13,6 +13,7 @@ public interface IStrategy
 public record StrategySignal(
     Guid MarketId,
     string MarketQuestion,
+    string TokenId,
     TradeSide RecommendedSide,
     Edge Edge,
     Probability FairValue,

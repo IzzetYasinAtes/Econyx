@@ -13,7 +13,6 @@ else
 {
     <div class="dashboard">
 
-        <!-- TOP BAR -->
         <div class="top-bar">
             <div class="top-bar-left">
                 <span class="agent-title mono">@L["Home_Agent"]</span>
@@ -30,7 +29,6 @@ else
             </div>
         </div>
 
-        <!-- METRIC CARDS -->
         <div class="metric-cards">
             <StatsCard Title="@L["Home_CurrentBalance"]"
                        Value="@FormatMoney(_stats.Balance)"
@@ -48,7 +46,6 @@ else
                        SubText="@WinLossText()" />
         </div>
 
-        <!-- MAIN AREA -->
         <div class="main-area">
             <div class="main-left">
                 <div class="chart-panel">
@@ -66,7 +63,6 @@ else
             </div>
         </div>
 
-        <!-- BOTTOM BAR -->
         <div class="bottom-bar mono">
             <div class="bottom-stat">
                 <span class="text-muted">@L["Home_DailyApiCost"]</span>

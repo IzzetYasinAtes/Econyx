@@ -91,6 +91,9 @@ public sealed class PositionMonitorService : BackgroundService
     {
         var market = await marketRepo.GetByIdAsync(position.MarketId, ct);
 
+        if (market is null)
+            return;
+
         if (market is { Status: MarketStatus.Resolved })
         {
             var resolvedPrice = market.ResolvedOutcome is not null
@@ -104,7 +107,7 @@ public sealed class PositionMonitorService : BackgroundService
             return;
         }
 
-        var firstOutcome = market?.Outcomes.FirstOrDefault();
+        var firstOutcome = market.Outcomes.FirstOrDefault();
         if (firstOutcome is null)
             return;
 
