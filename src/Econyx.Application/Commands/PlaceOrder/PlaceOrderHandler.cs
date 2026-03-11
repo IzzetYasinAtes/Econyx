@@ -31,13 +31,16 @@ public sealed class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Resul
     public async Task<Result<Guid>> Handle(PlaceOrderCommand request, CancellationToken cancellationToken)
     {
         var signal = request.Signal;
+        var marketPrice = Money.Create(signal.MarketPrice.Value);
+        var quantity = request.PositionSize.Amount / signal.MarketPrice.Value;
 
         var order = Order.Create(
             signal.MarketId,
+            signal.TokenId,
             signal.RecommendedSide,
             OrderType.Limit,
-            request.PositionSize,
-            request.PositionSize.Amount / signal.MarketPrice.Value,
+            marketPrice,
+            quantity,
             request.Mode,
             _platform.Platform);
 
@@ -55,7 +58,7 @@ public sealed class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Resul
                     cancellationToken);
 
                 order.SetPlatformOrderId(platformOrderId);
-                order.Fill(Money.Create(signal.MarketPrice.Value), order.Quantity);
+                order.Fill(marketPrice, order.Quantity);
             }
             catch (Exception ex)
             {
@@ -67,15 +70,16 @@ public sealed class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Resul
         }
         else
         {
-            order.Fill(Money.Create(signal.MarketPrice.Value), order.Quantity);
+            order.Fill(marketPrice, order.Quantity);
         }
 
         var position = Position.Create(
             signal.MarketId,
             signal.MarketQuestion,
+            signal.TokenId,
             _platform.Platform,
             signal.RecommendedSide,
-            Money.Create(signal.MarketPrice.Value),
+            marketPrice,
             order.Quantity,
             signal.StrategyName);
 

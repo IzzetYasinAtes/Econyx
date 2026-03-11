@@ -4,7 +4,6 @@ using Econyx.Application.Commands.ClosePosition;
 using Econyx.Application.Configuration;
 using Econyx.Application.Ports;
 using Econyx.Domain.Entities;
-using Econyx.Domain.Enums;
 using Econyx.Domain.Repositories;
 using Econyx.Domain.ValueObjects;
 using MediatR;
@@ -58,7 +57,6 @@ public sealed class PositionMonitorService : BackgroundService
     {
         await using var scope = _scopeFactory.CreateAsyncScope();
         var positionRepo = scope.ServiceProvider.GetRequiredService<IPositionRepository>();
-        var marketRepo = scope.ServiceProvider.GetRequiredService<IMarketRepository>();
         var platform = scope.ServiceProvider.GetRequiredService<IPlatformAdapter>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
@@ -73,7 +71,7 @@ public sealed class PositionMonitorService : BackgroundService
         {
             try
             {
-                await EvaluatePositionAsync(position, marketRepo, platform, mediator, ct);
+                await EvaluatePositionAsync(position, platform, mediator, ct);
             }
             catch (Exception ex)
             {
@@ -84,34 +82,11 @@ public sealed class PositionMonitorService : BackgroundService
 
     private async Task EvaluatePositionAsync(
         Position position,
-        IMarketRepository marketRepo,
         IPlatformAdapter platform,
         IMediator mediator,
         CancellationToken ct)
     {
-        var market = await marketRepo.GetByIdAsync(position.MarketId, ct);
-
-        if (market is null)
-            return;
-
-        if (market is { Status: MarketStatus.Resolved })
-        {
-            var resolvedPrice = market.ResolvedOutcome is not null
-                ? DetermineResolvedPrice(position.Side, market.ResolvedOutcome)
-                : position.CurrentPrice;
-
-            _logger.LogInformation(
-                "Market resolved — closing position: {Market}", position.MarketQuestion);
-
-            await mediator.Send(new ClosePositionCommand(position.Id, resolvedPrice), ct);
-            return;
-        }
-
-        var firstOutcome = market.Outcomes.FirstOrDefault();
-        if (firstOutcome is null)
-            return;
-
-        var currentProbability = await platform.GetPriceAsync(firstOutcome.Token.Value, ct);
+        var currentProbability = await platform.GetPriceAsync(position.TokenId, ct);
         var currentPrice = Money.Create(currentProbability.Value);
         position.UpdatePrice(currentPrice);
 
@@ -139,15 +114,5 @@ public sealed class PositionMonitorService : BackgroundService
 
             await mediator.Send(new ClosePositionCommand(position.Id, currentPrice), ct);
         }
-    }
-
-    private static Money DetermineResolvedPrice(TradeSide side, string resolvedOutcome)
-    {
-        var isYesResolution = resolvedOutcome.Equals("Yes", StringComparison.OrdinalIgnoreCase);
-        var price = (side == TradeSide.Yes && isYesResolution) || (side == TradeSide.No && !isYesResolution)
-            ? 1.00m
-            : 0.00m;
-
-        return Money.Create(price);
     }
 }

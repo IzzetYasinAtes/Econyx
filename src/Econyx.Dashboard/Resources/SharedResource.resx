@@ -292,4 +292,40 @@
   <data name="Settings_Survival" xml:space="preserve">
     <value>Survival</value>
   </data>
+  <data name="Settings_Clob" xml:space="preserve">
+    <value>CLOB</value>
+  </data>
+  <data name="Settings_Gamma" xml:space="preserve">
+    <value>Gamma</value>
+  </data>
+  <data name="Settings_Chain" xml:space="preserve">
+    <value>Chain</value>
+  </data>
+  <data name="Settings_SigType" xml:space="preserve">
+    <value>Sig Type</value>
+  </data>
+  <data name="Home_Initial" xml:space="preserve">
+    <value>initial</value>
+  </data>
+  <data name="Error_Title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Error_Message" xml:space="preserve">
+    <value>An error occurred while processing your request.</value>
+  </data>
+  <data name="Error_RequestId" xml:space="preserve">
+    <value>Request ID:</value>
+  </data>
+  <data name="Error_DevMode" xml:space="preserve">
+    <value>Development Mode</value>
+  </data>
+  <data name="Error_DevModeDesc" xml:space="preserve">
+    <value>Swapping to Development environment will display more detailed information about the error that occurred.</value>
+  </data>
+  <data name="NotFound_Title" xml:space="preserve">
+    <value>Not Found</value>
+  </data>
+  <data name="NotFound_Message" xml:space="preserve">
+    <value>Sorry, the content you are looking for does not exist.</value>
+  </data>
 </root>

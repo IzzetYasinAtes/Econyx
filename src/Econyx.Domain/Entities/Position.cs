@@ -10,6 +10,7 @@ public sealed class Position : AggregateRoot<Guid>
 {
     public Guid MarketId { get; private set; }
     public string MarketQuestion { get; private set; } = null!;
+    public string TokenId { get; private set; } = null!;
     public PlatformType Platform { get; private set; }
     public TradeSide Side { get; private set; }
     public Money EntryPrice { get; private set; } = null!;
@@ -25,6 +26,7 @@ public sealed class Position : AggregateRoot<Guid>
     public static Position Create(
         Guid marketId,
         string marketQuestion,
+        string tokenId,
         PlatformType platform,
         TradeSide side,
         Money entryPrice,
@@ -32,6 +34,7 @@ public sealed class Position : AggregateRoot<Guid>
         string strategyName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(marketQuestion);
+        ArgumentException.ThrowIfNullOrWhiteSpace(tokenId);
         ArgumentException.ThrowIfNullOrWhiteSpace(strategyName);
         ArgumentNullException.ThrowIfNull(entryPrice);
 
@@ -43,6 +46,7 @@ public sealed class Position : AggregateRoot<Guid>
             Id = Guid.NewGuid(),
             MarketId = marketId,
             MarketQuestion = marketQuestion,
+            TokenId = tokenId,
             Platform = platform,
             Side = side,
             EntryPrice = entryPrice,

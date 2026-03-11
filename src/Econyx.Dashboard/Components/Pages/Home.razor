@@ -32,7 +32,7 @@ else
         <div class="metric-cards">
             <StatsCard Title="@L["Home_CurrentBalance"]"
                        Value="@FormatMoney(_stats.Balance)"
-                       SubText="@($"initial: ${_initialBalance:F2}")" />
+                       SubText="@($"{L["Home_Initial"]}: ${_initialBalance:F2}")" />
             <StatsCard Title="@L["Home_TotalPnl"]"
                        Value="@FormatMoneyPnL(_stats.TotalPnL)"
                        ValueColor="@PnLColor(_stats.TotalPnL.Amount)"
@@ -125,7 +125,7 @@ else
         }
         catch (Exception ex)
         {
-            _activityLog.Add(new ActivityLogEntry(DateTime.Now, $"Error: {ex.Message}", "#f85149"));
+            _activityLog.Add(new ActivityLogEntry(DateTime.Now, $"{L["Error_Title"]}: {ex.Message}", "#f85149"));
         }
     }
 

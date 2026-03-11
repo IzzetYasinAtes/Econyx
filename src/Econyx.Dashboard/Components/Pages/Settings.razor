@@ -174,10 +174,10 @@
                 @L["Settings_Platform"]
             </div>
             <div class="settings-list">
-                <SettingRow Label="CLOB" Value="@_platform.Polymarket.BaseUrl" />
-                <SettingRow Label="Gamma" Value="@_platform.Polymarket.GammaBaseUrl" />
-                <SettingRow Label="Chain" Value="@_platform.Polymarket.ChainId.ToString()" />
-                <SettingRow Label="Sig Type" Value="@_platform.Polymarket.SignatureType.ToString()" />
+                <SettingRow Label="@L["Settings_Clob"]" Value="@_platform.Polymarket.BaseUrl" />
+                <SettingRow Label="@L["Settings_Gamma"]" Value="@_platform.Polymarket.GammaBaseUrl" />
+                <SettingRow Label="@L["Settings_Chain"]" Value="@_platform.Polymarket.ChainId.ToString()" />
+                <SettingRow Label="@L["Settings_SigType"]" Value="@_platform.Polymarket.SignatureType.ToString()" />
             </div>
         </div>
 

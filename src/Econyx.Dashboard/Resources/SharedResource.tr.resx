@@ -292,4 +292,40 @@
   <data name="Settings_Survival" xml:space="preserve">
     <value>Hayatta Kalma</value>
   </data>
+  <data name="Settings_Clob" xml:space="preserve">
+    <value>CLOB</value>
+  </data>
+  <data name="Settings_Gamma" xml:space="preserve">
+    <value>Gamma</value>
+  </data>
+  <data name="Settings_Chain" xml:space="preserve">
+    <value>Zincir</value>
+  </data>
+  <data name="Settings_SigType" xml:space="preserve">
+    <value>Imza Tipi</value>
+  </data>
+  <data name="Home_Initial" xml:space="preserve">
+    <value>baslangic</value>
+  </data>
+  <data name="Error_Title" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Error_Message" xml:space="preserve">
+    <value>Isteginiz islenirken bir hata olustu.</value>
+  </data>
+  <data name="Error_RequestId" xml:space="preserve">
+    <value>Istek Kimlik No:</value>
+  </data>
+  <data name="Error_DevMode" xml:space="preserve">
+    <value>Gelistirme Modu</value>
+  </data>
+  <data name="Error_DevModeDesc" xml:space="preserve">
+    <value>Gelistirme ortamina gecmek, olusan hata hakkinda daha ayrintili bilgi gosterecektir.</value>
+  </data>
+  <data name="NotFound_Title" xml:space="preserve">
+    <value>Bulunamadi</value>
+  </data>
+  <data name="NotFound_Message" xml:space="preserve">
+    <value>Aradiginiz icerik mevcut degil.</value>
+  </data>
 </root>

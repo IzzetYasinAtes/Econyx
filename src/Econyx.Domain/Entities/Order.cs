@@ -8,6 +8,7 @@ namespace Econyx.Domain.Entities;
 public sealed class Order : BaseEntity<Guid>
 {
     public Guid MarketId { get; private set; }
+    public string TokenId { get; private set; } = null!;
     public string? PlatformOrderId { get; private set; }
     public TradeSide Side { get; private set; }
     public OrderType Type { get; private set; }
@@ -25,6 +26,7 @@ public sealed class Order : BaseEntity<Guid>
 
     public static Order Create(
         Guid marketId,
+        string tokenId,
         TradeSide side,
         OrderType type,
         Money price,
@@ -33,6 +35,7 @@ public sealed class Order : BaseEntity<Guid>
         PlatformType platform,
         string? platformOrderId = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(tokenId);
         ArgumentNullException.ThrowIfNull(price);
 
         if (quantity <= 0)
@@ -42,6 +45,7 @@ public sealed class Order : BaseEntity<Guid>
         {
             Id = Guid.NewGuid(),
             MarketId = marketId,
+            TokenId = tokenId,
             PlatformOrderId = platformOrderId,
             Side = side,
             Type = type,
