@@ -1,26 +1,26 @@
 @page "/trades"
-@rendermode InteractiveServer
 @inject IMediator Mediator
+@inject AppLocalizer L
 
-<PageTitle>Trades — Econyx</PageTitle>
+<PageTitle>@L["Trades_Title"]</PageTitle>
 
 <div class="page-header">
-    <h2 class="page-title mono">TRADE HISTORY</h2>
+    <h2 class="page-title mono">@L["Trades_Header"]</h2>
     <span class="text-muted mono" style="font-size: 0.75rem;">
         @if (_history is not null)
         {
-            @($"{_history.TotalCount} total trades")
+            @L.Format("Trades_TotalCount", _history.TotalCount)
         }
     </span>
 </div>
 
 @if (_history is null)
 {
-    <div class="loading mono text-muted">Loading...</div>
+    <div class="loading mono text-muted">@L["Loading"]</div>
 }
 else if (_history.Items.Count == 0)
 {
-    <div class="empty-state mono text-muted">No trades yet</div>
+    <div class="empty-state mono text-muted">@L["Trades_Empty"]</div>
 }
 else
 {
@@ -28,15 +28,15 @@ else
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Market</th>
-                    <th>Side</th>
-                    <th>Entry</th>
-                    <th>Exit</th>
-                    <th>Qty</th>
-                    <th>PnL</th>
-                    <th>Duration</th>
-                    <th>Strategy</th>
-                    <th>Closed</th>
+                    <th>@L["Trades_Market"]</th>
+                    <th>@L["Trades_Side"]</th>
+                    <th>@L["Trades_Entry"]</th>
+                    <th>@L["Trades_Exit"]</th>
+                    <th>@L["Trades_Qty"]</th>
+                    <th>@L["Trades_PnL"]</th>
+                    <th>@L["Trades_Duration"]</th>
+                    <th>@L["Trades_Strategy"]</th>
+                    <th>@L["Trades_Closed"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -65,9 +65,9 @@ else
     @if (_totalPages > 1)
     {
         <div class="pagination mono">
-            <button class="page-btn" disabled="@(_page <= 1)" @onclick="PrevPage">&lt; PREV</button>
+            <button class="page-btn" disabled="@(_page <= 1)" @onclick="PrevPage">@L["Prev"]</button>
             <span class="text-muted">@_page / @_totalPages</span>
-            <button class="page-btn" disabled="@(_page >= _totalPages)" @onclick="NextPage">NEXT &gt;</button>
+            <button class="page-btn" disabled="@(_page >= _totalPages)" @onclick="NextPage">@L["Next"]</button>
         </div>
     }
 }

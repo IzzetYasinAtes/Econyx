@@ -1,4 +1,4 @@
-/* Full-height 3-column layout that fills the viewport without page scroll */
+/* Full-height 2-column layout that fills the viewport without page scroll */
 .page-header {
     display: flex;
     align-items: center;
@@ -24,10 +24,10 @@
 .status-badge.saving { background: var(--yellow-dim); color: var(--yellow); }
 .status-badge.success { background: var(--green-dim); color: var(--green); }
 
-/* 3-column grid that fills available height */
+/* 2-column grid that fills available height */
 .settings-layout {
     display: grid;
-    grid-template-columns: 1fr 280px 240px;
+    grid-template-columns: 1fr 340px;
     gap: 0.5rem;
     height: calc(100vh - 40px - 1.25rem - 1.25rem - 1.6rem);
     min-height: 0;
@@ -41,17 +41,12 @@
     min-height: 0;
 }
 
-.col-keys {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-}
-
 .col-config {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     min-height: 0;
+    overflow-y: auto;
 }
 
 /* Section cards */

@@ -1,11 +1,18 @@
 @inherits LayoutComponentBase
+@inject AppLocalizer L
+@inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <div class="econyx-root">
     <nav class="econyx-nav">
-        <NavLink class="nav-item" href="" Match="NavLinkMatch.All">Dashboard</NavLink>
-        <NavLink class="nav-item" href="positions">Positions</NavLink>
-        <NavLink class="nav-item" href="trades">Trades</NavLink>
-        <NavLink class="nav-item" href="settings">Settings</NavLink>
+        <NavLink class="nav-item" href="" Match="NavLinkMatch.All">@L["Nav_Dashboard"]</NavLink>
+        <NavLink class="nav-item" href="positions">@L["Nav_Positions"]</NavLink>
+        <NavLink class="nav-item" href="trades">@L["Nav_Trades"]</NavLink>
+        <NavLink class="nav-item" href="settings">@L["Nav_Settings"]</NavLink>
+        <select class="lang-select" value="@L.Culture" @onchange="OnCultureChanged">
+            <option value="en">EN</option>
+            <option value="tr">TR</option>
+        </select>
     </nav>
 
     <main class="econyx-main">
@@ -14,7 +21,28 @@
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
+    @L["Error_Unhandled"]
+    <a href="." class="reload">@L["Reload"]</a>
     <span class="dismiss">&#x1f5d9;</span>
 </div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var saved = await JS.InvokeAsync<string?>("localStorage.getItem", "econyx-lang");
+        if (!string.IsNullOrEmpty(saved) && saved != L.Culture)
+        {
+            L.SetCulture(saved);
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnCultureChanged(ChangeEventArgs e)
+    {
+        var culture = e.Value?.ToString() ?? "en";
+        L.SetCulture(culture);
+        await JS.InvokeVoidAsync("localStorage.setItem", "econyx-lang", culture);
+        Nav.NavigateTo(Nav.Uri, forceLoad: true);
+    }
+}

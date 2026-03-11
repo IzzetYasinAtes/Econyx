@@ -1,13 +1,13 @@
 @page "/"
-@rendermode InteractiveServer
 @inject IMediator Mediator
 @implements IDisposable
+@inject AppLocalizer L
 
-<PageTitle>Econyx Dashboard</PageTitle>
+<PageTitle>@L["Home_Title"]</PageTitle>
 
 @if (_stats is null)
 {
-    <div class="loading">Loading...</div>
+    <div class="loading">@L["Loading"]</div>
 }
 else
 {
@@ -16,33 +16,33 @@ else
         <!-- TOP BAR -->
         <div class="top-bar">
             <div class="top-bar-left">
-                <span class="agent-title mono">ECONYX AGENT</span>
+                <span class="agent-title mono">@L["Home_Agent"]</span>
                 <span class="agent-mode mono text-muted">//</span>
-                <span class="agent-mode mono text-yellow">SURVIVAL MODE</span>
+                <span class="agent-mode mono text-yellow">@L["Home_SurvivalMode"]</span>
                 <span class="status-dot"></span>
-                <span class="status-text mono text-green">ALIVE</span>
+                <span class="status-text mono text-green">@L["Home_Alive"]</span>
             </div>
             <div class="top-bar-right mono">
-                <span class="text-muted">UPTIME</span>
+                <span class="text-muted">@L["Home_Uptime"]</span>
                 <span>@FormatUptime(_stats.Uptime)</span>
-                <span class="text-muted" style="margin-left: 1rem;">CYCLE</span>
+                <span class="text-muted" style="margin-left: 1rem;">@L["Home_Cycle"]</span>
                 <span>#@_stats.CycleCount</span>
             </div>
         </div>
 
         <!-- METRIC CARDS -->
         <div class="metric-cards">
-            <StatsCard Title="CURRENT BALANCE"
+            <StatsCard Title="@L["Home_CurrentBalance"]"
                        Value="@FormatMoney(_stats.Balance)"
                        SubText="@($"initial: ${_initialBalance:F2}")" />
-            <StatsCard Title="TOTAL PnL"
+            <StatsCard Title="@L["Home_TotalPnl"]"
                        Value="@FormatMoneyPnL(_stats.TotalPnL)"
                        ValueColor="@PnLColor(_stats.TotalPnL.Amount)"
                        SubText="@FormatPnLPercent()" />
-            <StatsCard Title="API COSTS PAID"
+            <StatsCard Title="@L["Home_ApiCostsPaid"]"
                        Value="@FormatMoney(_stats.ApiCosts)"
-                       SubText="self-funded inference" />
-            <StatsCard Title="WIN RATE"
+                       SubText="@L["Home_SelfFunded"]" />
+            <StatsCard Title="@L["Home_WinRate"]"
                        Value="@($"{_stats.WinRate:F1}%")"
                        ValueColor="@(_stats.WinRate >= 50 ? "var(--green)" : "var(--red)")"
                        SubText="@WinLossText()" />
@@ -53,11 +53,11 @@ else
             <div class="main-left">
                 <div class="chart-panel">
                     <div class="chart-header">
-                        <span class="mono">BALANCE HISTORY (LOG SCALE)</span>
+                        <span class="mono">@L["Home_BalanceHistory"]</span>
                         <span class="mono text-muted">@FormatUptime(_stats.Uptime) / 48H</span>
                     </div>
                     <div class="chart-placeholder">
-                        <span class="text-muted mono">Chart will render with live data</span>
+                        <span class="text-muted mono">@L["Home_ChartPlaceholder"]</span>
                     </div>
                 </div>
             </div>
@@ -69,39 +69,39 @@ else
         <!-- BOTTOM BAR -->
         <div class="bottom-bar mono">
             <div class="bottom-stat">
-                <span class="text-muted">Daily API Cost</span>
+                <span class="text-muted">@L["Home_DailyApiCost"]</span>
                 <span>$@_stats.DailyApiCost.ToString("F2")</span>
             </div>
             <div class="bottom-stat">
-                <span class="text-muted">Runway</span>
-                <span>@(_stats.RunwayDays >= 0 ? $"{_stats.RunwayDays} days" : "∞")</span>
+                <span class="text-muted">@L["Home_Runway"]</span>
+                <span>@(_stats.RunwayDays >= 0 ? $"{_stats.RunwayDays} {L["Days"]}" : "∞")</span>
             </div>
             <div class="bottom-stat">
-                <span class="text-muted">Trades</span>
+                <span class="text-muted">@L["Home_Trades"]</span>
                 <span>@_stats.TotalTrades</span>
             </div>
             <div class="bottom-stat">
-                <span class="text-muted">Markets Scanned</span>
+                <span class="text-muted">@L["Home_MarketsScanned"]</span>
                 <span>@_stats.MarketsScanned</span>
             </div>
             <div class="bottom-stat">
-                <span class="text-muted">Open Positions</span>
+                <span class="text-muted">@L["Home_OpenPositions"]</span>
                 <span>@_stats.OpenPositions</span>
             </div>
             <div class="bottom-stat">
-                <span class="text-muted">Best Trade</span>
+                <span class="text-muted">@L["Home_BestTrade"]</span>
                 <span class="text-green">@FormatMoney(_stats.BestTrade)</span>
             </div>
             <div class="bottom-stat">
-                <span class="text-muted">Worst Trade</span>
+                <span class="text-muted">@L["Home_WorstTrade"]</span>
                 <span class="text-red">@FormatMoney(_stats.WorstTrade)</span>
             </div>
             <div class="bottom-stat">
-                <span class="text-muted">Sharpe Ratio</span>
+                <span class="text-muted">@L["Home_SharpeRatio"]</span>
                 <span>@_stats.SharpeRatio.ToString("F2")</span>
             </div>
             <div class="bottom-stat">
-                <span class="text-muted">Avg Edge</span>
+                <span class="text-muted">@L["Home_AvgEdge"]</span>
                 <span>@($"{_stats.AvgEdge:F1}%")</span>
             </div>
         </div>
@@ -125,7 +125,7 @@ else
         try
         {
             _stats = await Mediator.Send(new GetDashboardStatsQuery());
-            _activityLog.Add(new ActivityLogEntry(DateTime.Now, "Dashboard data loaded", "#3fb950"));
+            _activityLog.Add(new ActivityLogEntry(DateTime.Now, L["Home_DataLoaded"], "#3fb950"));
         }
         catch (Exception ex)
         {

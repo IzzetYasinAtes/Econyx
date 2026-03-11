@@ -3,6 +3,7 @@ using Econyx.Application;
 using Econyx.Application.Configuration;
 using Econyx.Dashboard.Components;
 using Econyx.Dashboard.Hubs;
+using Econyx.Dashboard.Services;
 using Econyx.Infrastructure;
 using Serilog;
 
@@ -38,6 +39,7 @@ try
         builder.Configuration.GetSection(PlatformOptions.SectionName));
 
     builder.Services.AddSignalR();
+    builder.Services.AddScoped<AppLocalizer>();
 
     var app = builder.Build();
 
