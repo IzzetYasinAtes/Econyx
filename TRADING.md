@@ -390,62 +390,62 @@ To reduce API costs, responses are cached for `CacheDurationMinutes` (default: 3
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    MARKET SCANNING (Every 5 min)                 │
-│                                                                  │
-│  Polymarket API → 500+ markets                                   │
-│       │                                                          │
-│       ▼                                                          │
-│  ┌─────────────────────────────────────────┐                     │
-│  │         RULE-BASED PRE-FILTER           │                     │
-│  │  • Volume >= $5,000                     │                     │
-│  │  • Spread <= 5¢                         │                     │
-│  │  • Price < 15¢ OR Price > 85¢           │                     │
-│  │  • Edge >= 6%                           │                     │
-│  └─────────────────────────────────────────┘                     │
-│       │ ~20-50 candidates                                        │
-│       ▼                                                          │
-│  ┌─────────────────────────────────────────┐                     │
-│  │         AI FAIR VALUE ANALYSIS          │                     │
-│  │  • Send market to Claude/GPT/Gemini     │                     │
-│  │  • Get fair probability estimate        │                     │
-│  │  • Calculate AI edge                    │                     │
-│  └─────────────────────────────────────────┘                     │
-│       │                                                          │
-│       ▼                                                          │
-│  ┌─────────────────────────────────────────┐                     │
-│  │         HYBRID DUAL CONFIRMATION        │                     │
-│  │  Rule signal + AI signal = SAME side?   │                     │
-│  │  YES → Trade    NO → Skip               │                     │
-│  └─────────────────────────────────────────┘                     │
-│       │ ~1-5 confirmed signals                                   │
-│       ▼                                                          │
-│  ┌─────────────────────────────────────────┐                     │
-│  │         KELLY CRITERION SIZING          │                     │
+│                    MARKET SCANNING (Every 5 min)                │
+│                                                                 │
+│  Polymarket API → 500+ markets                                  │
+│       │                                                         │
+│       ▼                                                         │
+│  ┌─────────────────────────────────────────┐                    │
+│  │         RULE-BASED PRE-FILTER           │                    │
+│  │  • Volume >= $5,000                     │                    │
+│  │  • Spread <= 5¢                         │                    │
+│  │  • Price < 15¢ OR Price > 85¢           │                    │
+│  │  • Edge >= 6%                           │                    │
+│  └─────────────────────────────────────────┘                    │
+│       │ ~20-50 candidates                                       │
+│       ▼                                                         │
+│  ┌─────────────────────────────────────────┐                    │
+│  │         AI FAIR VALUE ANALYSIS          │                    │
+│  │  • Send market to Claude/GPT/Gemini     │                    │
+│  │  • Get fair probability estimate        │                    │
+│  │  • Calculate AI edge                    │                    │
+│  └─────────────────────────────────────────┘                    │
+│       │                                                         │
+│       ▼                                                         │
+│  ┌─────────────────────────────────────────┐                    │
+│  │         HYBRID DUAL CONFIRMATION        │                    │
+│  │  Rule signal + AI signal = SAME side?   │                    │
+│  │  YES → Trade    NO → Skip               │                    │
+│  └─────────────────────────────────────────┘                    │
+│       │ ~1-5 confirmed signals                                  │
+│       ▼                                                         │
+│  ┌─────────────────────────────────────────┐                    │
+│  │         KELLY CRITERION SIZING          │                    │
 │  │  odds = (1/fairValue) - 1              │                     │
 │  │  kelly = edge / odds                   │                     │
 │  │  size = balance × min(kelly, 5%)       │                     │
-│  └─────────────────────────────────────────┘                     │
-│       │                                                          │
-│       ▼                                                          │
-│  ORDER + POSITION CREATED                                        │
+│  └─────────────────────────────────────────┘                    │
+│       │                                                         │
+│       ▼                                                         │
+│  ORDER + POSITION CREATED                                       │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│                 POSITION MONITORING (Every 60 sec)               │
-│                                                                  │
-│  For each open position:                                         │
-│       │                                                          │
-│       ▼                                                          │
-│  Get current price via position.TokenId                          │
-│       │                                                          │
-│       ▼                                                          │
-│  Calculate PnL%                                                  │
-│       │                                                          │
+│                 POSITION MONITORING (Every 60 sec)              │
+│                                                                 │
+│  For each open position:                                        │
+│       │                                                         │
+│       ▼                                                         │
+│  Get current price via position.TokenId                         │
+│       │                                                         │
+│       ▼                                                         │
+│  Calculate PnL%                                                 │
+│       │                                                         │
 │       ├── PnL% <= -15% → STOP LOSS → Close position             │
 │       ├── PnL% >= +25% → TAKE PROFIT → Close position           │
-│       └── Otherwise → Continue monitoring                        │
-│                                                                  │
-│  On close: Trade record created with realized PnL                │
+│       └── Otherwise → Continue monitoring                       │
+│                                                                 │
+│  On close: Trade record created with realized PnL               │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -852,62 +852,62 @@ API maliyetlerini azaltmak icin yanitlar `CacheDurationMinutes` (varsayilan: 30 
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    PIYASA TARAMA (Her 5 dk)                      │
-│                                                                  │
-│  Polymarket API → 500+ piyasa                                    │
-│       │                                                          │
-│       ▼                                                          │
-│  ┌─────────────────────────────────────────┐                     │
-│  │        KURAL TABANLI ON-FILTRE          │                     │
-│  │  • Hacim >= $5,000                      │                     │
-│  │  • Spread <= 5¢                         │                     │
-│  │  • Fiyat < 15¢ VEYA Fiyat > 85¢        │                     │
-│  │  • Edge >= %6                           │                     │
-│  └─────────────────────────────────────────┘                     │
-│       │ ~20-50 aday                                              │
-│       ▼                                                          │
-│  ┌─────────────────────────────────────────┐                     │
-│  │        AI GERCEK DEGER ANALIZI          │                     │
-│  │  • Piyasayi Claude/GPT/Gemini'ye gonder │                     │
-│  │  • Gercek olasilik tahmini al           │                     │
-│  │  • AI edge hesapla                      │                     │
-│  └─────────────────────────────────────────┘                     │
-│       │                                                          │
-│       ▼                                                          │
-│  ┌─────────────────────────────────────────┐                     │
-│  │        HIBRIT CIFT ONAY                 │                     │
-│  │  Kural sinyali + AI sinyali = AYNI yon? │                     │
-│  │  EVET → Islem    HAYIR → Atla           │                     │
-│  └─────────────────────────────────────────┘                     │
-│       │ ~1-5 onaylanmis sinyal                                   │
-│       ▼                                                          │
-│  ┌─────────────────────────────────────────┐                     │
-│  │        KELLY KRITERI BOYUTLANDIRMA      │                     │
-│  │  odds = (1/fairValue) - 1              │                     │
-│  │  kelly = edge / odds                   │                     │
-│  │  boyut = bakiye × min(kelly, %5)       │                     │
-│  └─────────────────────────────────────────┘                     │
-│       │                                                          │
-│       ▼                                                          │
-│  EMIR + POZISYON OLUSTURULDU                                     │
+│                    PIYASA TARAMA (Her 5 dk)                     │
+│                                                                 │
+│  Polymarket API → 500+ piyasa                                   │
+│       │                                                         │
+│       ▼                                                         │
+│  ┌─────────────────────────────────────────┐                    │
+│  │        KURAL TABANLI ON-FILTRE          │                    │
+│  │  • Hacim >= $5,000                      │                    │
+│  │  • Spread <= 5¢                         │                    │
+│  │  • Fiyat < 15¢ VEYA Fiyat > 85¢         │                    │
+│  │  • Edge >= %6                           │                    │
+│  └─────────────────────────────────────────┘                    │
+│       │ ~20-50 aday                                             │
+│       ▼                                                         │
+│  ┌─────────────────────────────────────────┐                    │
+│  │        AI GERCEK DEGER ANALIZI          │                    │
+│  │  • Piyasayi Claude/GPT/Gemini'ye gonder │                    │
+│  │  • Gercek olasilik tahmini al           │                    │
+│  │  • AI edge hesapla                      │                    │
+│  └─────────────────────────────────────────┘                    │
+│       │                                                         │
+│       ▼                                                         │
+│  ┌─────────────────────────────────────────┐                    │
+│  │        HIBRIT CIFT ONAY                 │                    │
+│  │  Kural sinyali + AI sinyali = AYNI yon? │                    │
+│  │  EVET → Islem    HAYIR → Atla           │                    │
+│  └─────────────────────────────────────────┘                    │
+│       │ ~1-5 onaylanmis sinyal                                  │
+│       ▼                                                         │
+│  ┌─────────────────────────────────────────┐                    │
+│  │        KELLY KRITERI BOYUTLANDIRMA      │                    │
+│  │  odds = (1/fairValue) - 1               │                    │
+│  │  kelly = edge / odds                    │                    │
+│  │  boyut = bakiye × min(kelly, %5)        │                    │
+│  └─────────────────────────────────────────┘                    │
+│       │                                                         │
+│       ▼                                                         │
+│  EMIR + POZISYON OLUSTURULDU                                    │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│                POZISYON IZLEME (Her 60 sn)                       │
-│                                                                  │
-│  Her acik pozisyon icin:                                         │
-│       │                                                          │
-│       ▼                                                          │
-│  position.TokenId ile guncel fiyat al                            │
-│       │                                                          │
-│       ▼                                                          │
-│  PnL% hesapla                                                    │
-│       │                                                          │
+│                POZISYON IZLEME (Her 60 sn)                      │
+│                                                                 │
+│  Her acik pozisyon icin:                                        │
+│       │                                                         │
+│       ▼                                                         │
+│  position.TokenId ile guncel fiyat al                           │
+│       │                                                         │
+│       ▼                                                         │
+│  PnL% hesapla                                                   │
+│       │                                                         │
 │       ├── PnL% <= -%15 → ZARAR DURDUR → Pozisyonu kapat         │
 │       ├── PnL% >= +%25 → KAR AL → Pozisyonu kapat               │
-│       └── Aksi halde → Izlemeye devam                            │
-│                                                                  │
-│  Kapatmada: Gerceklesen kar/zarar ile Trade kaydi olusturulur    │
+│       └── Aksi halde → Izlemeye devam                           │
+│                                                                 │
+│  Kapatmada: Gerceklesen kar/zarar ile Trade kaydi olusturulur   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 

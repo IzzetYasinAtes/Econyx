@@ -21,32 +21,32 @@ Dependencies always flow inward. Outer layers depend on inner layers, never the 
 
 ```
                     ┌─────────────────────────────────┐
-                    │   PRESENTATION (Outermost Ring)   │
-                    │   Blazor Dashboard / Worker       │
-                    │                                   │
-                    │  ┌───────────────────────────┐    │
-                    │  │   INFRASTRUCTURE           │    │
-                    │  │   EF Core / Polymarket.Net │    │
-                    │  │   AI Services / Secrets    │    │
-                    │  │                            │    │
-                    │  │  ┌─────────────────────┐   │    │
-                    │  │  │   APPLICATION        │   │    │
-                    │  │  │   CQRS / Strategies  │   │    │
-                    │  │  │   Port Interfaces    │   │    │
-                    │  │  │                      │   │    │
-                    │  │  │  ┌───────────────┐   │   │    │
-                    │  │  │  │    DOMAIN      │   │   │    │
-                    │  │  │  │  Entities /    │   │   │    │
-                    │  │  │  │  Services      │   │   │    │
-                    │  │  │  │               │   │   │    │
-                    │  │  │  │  ┌─────────┐  │   │   │    │
-                    │  │  │  │  │  CORE   │  │   │   │    │
-                    │  │  │  │  │ Base    │  │   │   │    │
-                    │  │  │  │  │ Abstrs  │  │   │   │    │
-                    │  │  │  │  └─────────┘  │   │   │    │
-                    │  │  │  └───────────────┘   │   │    │
-                    │  │  └─────────────────────┘   │    │
-                    │  └───────────────────────────┘    │
+                    │   PRESENTATION (Outermost Ring) │
+                    │   Blazor Dashboard / Worker     │
+                    │                                 │
+                    │  ┌───────────────────────────┐  │
+                    │  │   INFRASTRUCTURE          │  │
+                    │  │   EF Core /Polymarket.Net │  │
+                    │  │   AI Services / Secrets   │  │
+                    │  │                           │  │
+                    │  │  ┌─────────────────────┐  │  │
+                    │  │  │   APPLICATION       │  │  │
+                    │  │  │   CQRS / Strategies │  │  │
+                    │  │  │   Port Interfaces   │  │  │
+                    │  │  │                     │  │  │
+                    │  │  │  ┌───────────────┐  │  │  │
+                    │  │  │  │    DOMAIN     │  │  │  │
+                    │  │  │  │  Entities /   │  │  │  │
+                    │  │  │  │  Services     │  │  │  │
+                    │  │  │  │               │  │  │  │
+                    │  │  │  │  ┌─────────┐  │  │  │  │
+                    │  │  │  │  │  CORE   │  │  │  │  │
+                    │  │  │  │  │ Base    │  │  │  │  │
+                    │  │  │  │  │ Abstrs  │  │  │  │  │
+                    │  │  │  │  └─────────┘  │  │  │  │
+                    │  │  │  └───────────────┘  │  │  │
+                    │  │  └─────────────────────┘  │  │
+                    │  └───────────────────────────┘  │
                     └─────────────────────────────────┘
 ```
 
@@ -225,32 +225,32 @@ Bagimlilik yonu her zaman iceriye dogrudur. Dis katmanlar ic katmanlara bagimlid
 
 ```
                     ┌─────────────────────────────────┐
-                    │   PRESENTATION (En Dis Halka)    │
-                    │   Blazor Dashboard / Worker      │
-                    │                                  │
-                    │  ┌───────────────────────────┐   │
-                    │  │   INFRASTRUCTURE           │   │
-                    │  │   EF Core / Polymarket.Net │   │
-                    │  │   AI Services / Secrets    │   │
-                    │  │                            │   │
-                    │  │  ┌─────────────────────┐   │   │
-                    │  │  │   APPLICATION        │   │   │
-                    │  │  │   CQRS / Strategies  │   │   │
-                    │  │  │   Port Interfaces    │   │   │
-                    │  │  │                      │   │   │
-                    │  │  │  ┌───────────────┐   │   │   │
-                    │  │  │  │    DOMAIN      │   │   │   │
-                    │  │  │  │  Entities /    │   │   │   │
-                    │  │  │  │  Services      │   │   │   │
-                    │  │  │  │               │   │   │   │
-                    │  │  │  │  ┌─────────┐  │   │   │   │
-                    │  │  │  │  │  CORE   │  │   │   │   │
-                    │  │  │  │  │ Base    │  │   │   │   │
-                    │  │  │  │  │ Abstrs  │  │   │   │   │
-                    │  │  │  │  └─────────┘  │   │   │   │
-                    │  │  │  └───────────────┘   │   │   │
-                    │  │  └─────────────────────┘   │   │
-                    │  └───────────────────────────┘   │
+                    │   PRESENTATION (En Dis Halka)   │
+                    │   Blazor Dashboard / Worker     │
+                    │                                 │
+                    │  ┌───────────────────────────┐  │
+                    │  │   INFRASTRUCTURE          │  │
+                    │  │   EF Core / Polymarket.Net│  │
+                    │  │   AI Services / Secrets   │  │
+                    │  │                           │  │
+                    │  │  ┌─────────────────────┐  │  │
+                    │  │  │   APPLICATION       │  │  │
+                    │  │  │   CQRS / Strategies │  │  │
+                    │  │  │   Port Interfaces   │  │  │
+                    │  │  │                     │  │  │
+                    │  │  │  ┌───────────────┐  │  │  │
+                    │  │  │  │    DOMAIN     │  │  │  │
+                    │  │  │  │  Entities /   │  │  │  │
+                    │  │  │  │  Services     │  │  │  │
+                    │  │  │  │               │  │  │  │
+                    │  │  │  │  ┌─────────┐  │  │  │  │
+                    │  │  │  │  │  CORE   │  │  │  │  │
+                    │  │  │  │  │ Base    │  │  │  │  │
+                    │  │  │  │  │ Abstrs  │  │  │  │  │
+                    │  │  │  │  └─────────┘  │  │  │  │
+                    │  │  │  └───────────────┘  │  │  │
+                    │  │  └─────────────────────┘  │  │
+                    │  └───────────────────────────┘  │
                     └─────────────────────────────────┘
 ```
 
