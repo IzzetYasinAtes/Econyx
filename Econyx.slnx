@@ -7,4 +7,11 @@
     <Project Path="src/Econyx.Infrastructure/Econyx.Infrastructure.csproj" />
     <Project Path="src/Econyx.Worker/Econyx.Worker.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Econyx.Core.Tests/Econyx.Core.Tests.csproj" />
+    <Project Path="tests/Econyx.Domain.Tests/Econyx.Domain.Tests.csproj" />
+    <Project Path="tests/Econyx.Application.Tests/Econyx.Application.Tests.csproj" />
+    <Project Path="tests/Econyx.Infrastructure.Tests/Econyx.Infrastructure.Tests.csproj" />
+    <Project Path="tests/Econyx.Worker.Tests/Econyx.Worker.Tests.csproj" />
+  </Folder>
 </Solution>
