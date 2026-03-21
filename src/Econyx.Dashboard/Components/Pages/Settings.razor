@@ -11,7 +11,6 @@
 @using MediatR
 @inject IOptions<TradingOptions> TradingOpts
 @inject IOptions<AiOptions> AiOpts
-@inject IOptions<PlatformOptions> PlatformOpts
 @inject IMediator Mediator
 @inject IStringLocalizer<SharedResource> L
 
@@ -170,19 +169,6 @@
 
         <div class="settings-section">
             <div class="section-header">
-                <span class="section-dot dot-yellow"></span>
-                @L["Settings_Platform"]
-            </div>
-            <div class="settings-list">
-                <SettingRow Label="@L["Settings_Clob"]" Value="@_platform.Polymarket.BaseUrl" />
-                <SettingRow Label="@L["Settings_Gamma"]" Value="@_platform.Polymarket.GammaBaseUrl" />
-                <SettingRow Label="@L["Settings_Chain"]" Value="@_platform.Polymarket.ChainId.ToString()" />
-                <SettingRow Label="@L["Settings_SigType"]" Value="@_platform.Polymarket.SignatureType.ToString()" />
-            </div>
-        </div>
-
-        <div class="settings-section">
-            <div class="section-header">
                 <span class="section-dot dot-red"></span>
                 @L["Settings_ApiKeys"]
             </div>
@@ -227,7 +213,6 @@
 @code {
     private TradingOptions _trading = new();
     private AiOptions _ai = new();
-    private PlatformOptions _platform = new();
 
     private ActiveAiConfigDto? _activeConfig;
     private List<OpenRouterModelDto> _allModels = [];
@@ -268,7 +253,6 @@
     {
         _trading = TradingOpts.Value;
         _ai = AiOpts.Value;
-        _platform = PlatformOpts.Value;
 
         _activeConfig = await Mediator.Send(new GetActiveAiConfigQuery());
 

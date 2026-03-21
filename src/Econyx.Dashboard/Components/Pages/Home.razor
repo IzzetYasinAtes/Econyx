@@ -1,4 +1,6 @@
 @page "/"
+@using ApexCharts
+@using Econyx.Application.Queries.GetBalanceHistory
 @inject IMediator Mediator
 @implements IDisposable
 @inject IStringLocalizer<SharedResource> L
@@ -37,13 +39,14 @@ else
                        Value="@FormatMoneyPnL(_stats.TotalPnL)"
                        ValueColor="@PnLColor(_stats.TotalPnL.Amount)"
                        SubText="@FormatPnLPercent()" />
-            <StatsCard Title="@L["Home_ApiCostsPaid"]"
-                       Value="@FormatMoney(_stats.ApiCosts)"
-                       SubText="@L["Home_SelfFunded"]" />
             <StatsCard Title="@L["Home_WinRate"]"
                        Value="@($"{_stats.WinRate:F1}%")"
                        ValueColor="@(_stats.WinRate >= 50 ? "var(--green)" : "var(--red)")"
                        SubText="@WinLossText()" />
+            <StatsCard Title="@L["Home_AvgEdge"]"
+                       Value="@($"{_stats.AvgEdge:F1}%")"
+                       ValueColor="@(_stats.AvgEdge >= 0 ? "var(--green)" : "var(--red)")"
+                       SubText="@($"{L["Home_MarketsScanned"]}: {_stats.MarketsScanned}")" />
         </div>
 
         <div class="main-area">
@@ -53,8 +56,26 @@ else
                         <span class="mono">@L["Home_BalanceHistory"]</span>
                         <span class="mono text-muted">@FormatUptime(_stats.Uptime) / 48H</span>
                     </div>
-                    <div class="chart-placeholder">
-                        <span class="text-muted mono">@L["Home_ChartPlaceholder"]</span>
+                    <div class="chart-wrapper">
+                        @if (_balanceHistory.Count > 0)
+                        {
+                            <ApexChart TItem="BalanceHistoryPoint"
+                                       Options="_chartOptions"
+                                       Height="@("100%")"
+                                       Width="@("100%")"
+                                       >
+                                <ApexPointSeries TItem="BalanceHistoryPoint"
+                                                 Items="_balanceHistory"
+                                                 SeriesType="SeriesType.Area"
+                                                 Name="Total Portfolio"
+                                                 XValue="@(p => p.Timestamp.ToString("HH:mm"))"
+                                                 YValue="@(p => p.Balance)" />
+                            </ApexChart>
+                        }
+                        else
+                        {
+                            <span class="text-muted mono" style="margin: auto;">@L["Home_ChartPlaceholder"]</span>
+                        }
                     </div>
                 </div>
             </div>
@@ -64,14 +85,6 @@ else
         </div>
 
         <div class="bottom-bar mono">
-            <div class="bottom-stat">
-                <span class="text-muted">@L["Home_DailyApiCost"]</span>
-                <span>$@_stats.DailyApiCost.ToString("F2")</span>
-            </div>
-            <div class="bottom-stat">
-                <span class="text-muted">@L["Home_Runway"]</span>
-                <span>@(_stats.RunwayDays >= 0 ? $"{_stats.RunwayDays} {L["Days"]}" : "∞")</span>
-            </div>
             <div class="bottom-stat">
                 <span class="text-muted">@L["Home_Trades"]</span>
                 <span>@_stats.TotalTrades</span>
@@ -96,10 +109,6 @@ else
                 <span class="text-muted">@L["Home_SharpeRatio"]</span>
                 <span>@_stats.SharpeRatio.ToString("F2")</span>
             </div>
-            <div class="bottom-stat">
-                <span class="text-muted">@L["Home_AvgEdge"]</span>
-                <span>@($"{_stats.AvgEdge:F1}%")</span>
-            </div>
         </div>
     </div>
 }
@@ -109,6 +118,76 @@ else
     private Timer? _timer;
     private decimal _initialBalance = 50m;
     private List<ActivityLogEntry> _activityLog = [];
+    private List<BalanceHistoryPoint> _balanceHistory = [];
+
+    private ApexChartOptions<BalanceHistoryPoint> _chartOptions = new()
+    {
+        Chart = new Chart
+        {
+            Background = "transparent",
+            ForeColor = "#8b949e",
+            Toolbar = new Toolbar { Show = false },
+            Sparkline = new ChartSparkline { Enabled = false },
+            Animations = new Animations
+            {
+                Enabled = true,
+                Easing = Easing.Easeinout,
+                Speed = 600
+            },
+            Zoom = new Zoom { Enabled = false }
+        },
+        Colors = ["#3fb950"],
+        Stroke = new Stroke { Curve = Curve.Smooth, Width = 2 },
+        Fill = new Fill
+        {
+            Type = new List<FillType> { FillType.Gradient },
+            Gradient = new FillGradient
+            {
+                ShadeIntensity = 1,
+                OpacityFrom = 0.35,
+                OpacityTo = 0.02,
+                Stops = [0, 95, 100]
+            }
+        },
+        DataLabels = new DataLabels { Enabled = false },
+        Markers = new Markers { Size = 0 },
+        Grid = new Grid
+        {
+            Show = true,
+            BorderColor = "#21262d",
+            StrokeDashArray = 3,
+            Padding = new Padding { Left = 10, Right = 10, Top = 0, Bottom = 0 }
+        },
+        Xaxis = new XAxis
+        {
+            Labels = new XAxisLabels
+            {
+                Style = new AxisLabelStyle { FontSize = "10px", FontFamily = "var(--font-mono)" },
+                RotateAlways = false
+            },
+            AxisTicks = new AxisTicks { Show = false }
+        },
+        Yaxis =
+        [
+            new YAxis
+            {
+                Labels = new YAxisLabels
+                {
+                    Formatter = @"function(val) { return '$' + val.toFixed(2); }",
+                    Style = new AxisLabelStyle { FontSize = "10px", FontFamily = "var(--font-mono)" }
+                }
+            }
+        ],
+        Tooltip = new Tooltip
+        {
+            Theme = Mode.Dark,
+            X = new TooltipX { Show = true },
+            Y = new TooltipY
+            {
+                Formatter = @"function(val) { return '$' + val.toFixed(2); }"
+            }
+        }
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -121,6 +200,7 @@ else
         try
         {
             _stats = await Mediator.Send(new GetDashboardStatsQuery());
+            _balanceHistory = (await Mediator.Send(new GetBalanceHistoryQuery())).ToList();
             _activityLog.Add(new ActivityLogEntry(DateTime.Now, L["Home_DataLoaded"], "#3fb950"));
         }
         catch (Exception ex)

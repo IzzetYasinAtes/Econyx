@@ -1,4 +1,5 @@
 using Econyx.Application.Commands.ClosePosition;
+using Econyx.Application.Ports;
 using Econyx.Core.Interfaces;
 using Econyx.Domain.Entities;
 using Econyx.Domain.Enums;
@@ -14,11 +15,13 @@ public sealed class ClosePositionHandlerTests
     private readonly Mock<IPositionRepository> _positionRepoMock = new();
     private readonly Mock<ITradeRepository> _tradeRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+    private readonly Mock<IPlatformAdapter> _platformMock = new();
 
     private ClosePositionHandler CreateHandler() => new(
         _positionRepoMock.Object,
         _tradeRepoMock.Object,
-        _unitOfWorkMock.Object);
+        _unitOfWorkMock.Object,
+        _platformMock.Object);
 
     private static Position CreateOpenPosition()
     {

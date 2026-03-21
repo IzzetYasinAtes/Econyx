@@ -13,6 +13,7 @@ public interface IPlatformAdapter
     Task<Money> GetBalanceAsync(CancellationToken ct = default);
     Task<string> PlaceOrderAsync(PlaceOrderRequest request, CancellationToken ct = default);
     Task CancelOrderAsync(string platformOrderId, CancellationToken ct = default);
+    Task CreditBalanceAsync(decimal amount, CancellationToken ct = default);
 }
 
 public record MarketOrderBook(

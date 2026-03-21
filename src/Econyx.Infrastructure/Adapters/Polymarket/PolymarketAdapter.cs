@@ -91,6 +91,9 @@ internal sealed partial class PolymarketAdapter : IPlatformAdapter
             "Live order cancellation requires Polymarket CLOB signing integration. Use PaperTrading mode for now.");
     }
 
+    public Task CreditBalanceAsync(decimal amount, CancellationToken ct = default)
+        => Task.CompletedTask;
+
     [LoggerMessage(Level = LogLevel.Warning, Message = "Polymarket GetEventsAsync failed: {Error}")]
     private static partial void LogGetEventsFailed(ILogger logger, string? error);
 

@@ -9,7 +9,6 @@ public sealed record DashboardStatsDto(
     Money Balance,
     Money TotalPnL,
     decimal WinRate,
-    Money ApiCosts,
     int OpenPositions,
     int TotalTrades,
     int MarketsScanned,
@@ -18,6 +17,4 @@ public sealed record DashboardStatsDto(
     Money WorstTrade,
     decimal SharpeRatio,
     TimeSpan Uptime,
-    int CycleCount,
-    decimal DailyApiCost,
-    int RunwayDays);
+    int CycleCount);

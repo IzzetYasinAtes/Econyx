@@ -20,11 +20,18 @@
     font-size: 0.85rem;
 }
 
+.trades-layout {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+}
+
 .table-container {
+    flex: 1;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    overflow: auto;
+    overflow-y: auto;
 }
 
 .data-table {
@@ -91,6 +98,7 @@
 }
 
 .pagination {
+    flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Econyx.Application.Commands.PlaceOrder;
 using Econyx.Application.Commands.ScanMarkets;
 using Econyx.Application.Configuration;
+using Econyx.Application.Ports;
 using Econyx.Domain.Repositories;
 using Econyx.Domain.Services;
 using Econyx.Domain.ValueObjects;
@@ -17,15 +18,18 @@ public sealed class MarketScannerService : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly TradingOptions _tradingOptions;
     private readonly ILogger<MarketScannerService> _logger;
+    private readonly IScanStatistics _scanStatistics;
 
     public MarketScannerService(
         IServiceScopeFactory scopeFactory,
         IOptions<TradingOptions> tradingOptions,
-        ILogger<MarketScannerService> logger)
+        ILogger<MarketScannerService> logger,
+        IScanStatistics scanStatistics)
     {
         _scopeFactory = scopeFactory;
         _tradingOptions = tradingOptions.Value;
         _logger = logger;
+        _scanStatistics = scanStatistics;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -48,6 +52,8 @@ public sealed class MarketScannerService : BackgroundService
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
                 var result = await mediator.Send(new ScanMarketsCommand(), stoppingToken);
+
+                _scanStatistics.RecordScan(result.MarketsScanned);
 
                 _logger.LogInformation(
                     "Cycle #{Cycle} — {Scanned} markets scanned, {Signals} signals found, duration: {Duration:N0}ms",
@@ -92,7 +98,11 @@ public sealed class MarketScannerService : BackgroundService
             return;
         }
 
-        var signalsToProcess = scanResult.Signals.Take(availableSlots);
+        var existingMarketIds = openPositions.Select(p => p.MarketId).ToHashSet();
+
+        var signalsToProcess = scanResult.Signals
+            .Where(s => !existingMarketIds.Contains(s.MarketId))
+            .Take(availableSlots);
 
         foreach (var signal in signalsToProcess)
         {
