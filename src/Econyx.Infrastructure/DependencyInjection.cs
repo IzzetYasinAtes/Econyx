@@ -20,6 +20,7 @@ using Econyx.Infrastructure.AiServices.OpenRouter;
 using Econyx.Infrastructure.Persistence;
 using Econyx.Infrastructure.Persistence.Repositories;
 using Econyx.Infrastructure.Secrets;
+using Econyx.Infrastructure.Services;
 
 public static class DependencyInjection
 {
@@ -30,6 +31,7 @@ public static class DependencyInjection
         services.AddPlatformAdapters(config);
         services.AddAiServices(config);
         services.AddSecretManagers(config);
+        services.AddSingleton<IScanStatistics, ScanStatisticsTracker>();
 
         return services;
     }

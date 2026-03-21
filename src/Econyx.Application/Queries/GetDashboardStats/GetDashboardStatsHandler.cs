@@ -1,12 +1,10 @@
 namespace Econyx.Application.Queries.GetDashboardStats;
 
-using Econyx.Application.Configuration;
 using Econyx.Application.Ports;
 using Econyx.Application.Services;
 using Econyx.Domain.Repositories;
 using Econyx.Domain.ValueObjects;
 using MediatR;
-using Microsoft.Extensions.Options;
 
 public sealed class GetDashboardStatsHandler : IRequestHandler<GetDashboardStatsQuery, DashboardStatsDto>
 {
@@ -14,7 +12,7 @@ public sealed class GetDashboardStatsHandler : IRequestHandler<GetDashboardStats
     private readonly IPositionRepository _positionRepository;
     private readonly ITradeRepository _tradeRepository;
     private readonly IBalanceSnapshotRepository _snapshotRepository;
-    private readonly TradingOptions _options;
+    private readonly IScanStatistics _scanStatistics;
     private static readonly DateTime StartTime = DateTime.UtcNow;
 
     public GetDashboardStatsHandler(
@@ -22,13 +20,13 @@ public sealed class GetDashboardStatsHandler : IRequestHandler<GetDashboardStats
         IPositionRepository positionRepository,
         ITradeRepository tradeRepository,
         IBalanceSnapshotRepository snapshotRepository,
-        IOptions<TradingOptions> options)
+        IScanStatistics scanStatistics)
     {
         _platform = platform;
         _positionRepository = positionRepository;
         _tradeRepository = tradeRepository;
         _snapshotRepository = snapshotRepository;
-        _options = options.Value;
+        _scanStatistics = scanStatistics;
     }
 
     public async Task<DashboardStatsDto> Handle(GetDashboardStatsQuery request, CancellationToken cancellationToken)
@@ -50,32 +48,57 @@ public sealed class GetDashboardStatsHandler : IRequestHandler<GetDashboardStats
 
         var uptime = DateTime.UtcNow - StartTime;
 
-        var totalApiCost = snapshots.Count > 0
-            ? snapshots.Sum(s => s.ApiCosts.Amount)
-            : 0m;
-        var uptimeDays = uptime.TotalDays;
-        var dailyApiCost = uptimeDays >= 1 && totalApiCost > 0
-            ? totalApiCost / (decimal)uptimeDays
-            : 0m;
-        var runwayDays = dailyApiCost > 0
-            ? (int)(balance.Amount / dailyApiCost)
-            : -1;
+        var sharpeRatio = CalculateSharpeRatio(allTrades);
+        var avgEdge = CalculateAvgEdge(allTrades);
 
         return new DashboardStatsDto(
             balance,
             totalPnL,
-            winRate,
-            Money.Zero(),
+            winRate * 100,
             openPositions.Count,
             allTrades.Count,
-            0,
-            0m,
+            _scanStatistics.TotalMarketsScanned,
+            avgEdge,
             bestTrade,
             worstTrade,
-            0m,
+            sharpeRatio,
             uptime,
-            snapshots.Count,
-            dailyApiCost,
-            runwayDays);
+            snapshots.Count);
+    }
+
+    private static decimal CalculateSharpeRatio(IReadOnlyList<Domain.Entities.Trade> trades)
+    {
+        if (trades.Count < 2)
+            return 0m;
+
+        var returns = trades
+            .Select(t =>
+            {
+                var entryAmount = t.EntryPrice.Amount * t.Quantity;
+                return entryAmount > 0 ? t.PnL.Amount / entryAmount : 0m;
+            })
+            .ToList();
+
+        var avgReturn = returns.Average();
+        var variance = returns.Sum(r => (r - avgReturn) * (r - avgReturn)) / (returns.Count - 1);
+        var stdDev = (decimal)Math.Sqrt((double)variance);
+
+        return stdDev > 0 ? Math.Round(avgReturn / stdDev, 2) : 0m;
+    }
+
+    private static decimal CalculateAvgEdge(IReadOnlyList<Domain.Entities.Trade> trades)
+    {
+        if (trades.Count == 0)
+            return 0m;
+
+        var edges = trades
+            .Select(t =>
+            {
+                var entryAmount = t.EntryPrice.Amount * t.Quantity;
+                return entryAmount > 0 ? t.PnL.Amount / entryAmount * 100 : 0m;
+            })
+            .ToList();
+
+        return Math.Round(edges.Average(), 1);
     }
 }

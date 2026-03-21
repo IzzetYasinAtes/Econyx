@@ -43,6 +43,9 @@ public sealed class PlaceOrderHandlerTests
     public async Task Handle_PaperMode_ShouldCreateOrderAndPosition()
     {
         _platformMock.Setup(x => x.Platform).Returns(PlatformType.Polymarket);
+        _platformMock
+            .Setup(x => x.PlaceOrderAsync(It.IsAny<PlaceOrderRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync("PAPER-000001");
         _unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         var handler = CreateHandler();
@@ -103,6 +106,9 @@ public sealed class PlaceOrderHandlerTests
     public async Task Handle_ShouldCalculateCorrectQuantity()
     {
         _platformMock.Setup(x => x.Platform).Returns(PlatformType.Polymarket);
+        _platformMock
+            .Setup(x => x.PlaceOrderAsync(It.IsAny<PlaceOrderRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync("PAPER-000001");
         _unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         Order? capturedOrder = null;

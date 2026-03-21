@@ -1,5 +1,6 @@
 namespace Econyx.Application.Commands.ClosePosition;
 
+using Econyx.Application.Ports;
 using Econyx.Core.Interfaces;
 using Econyx.Core.Primitives;
 using Econyx.Domain.Entities;
@@ -12,15 +13,18 @@ public sealed class ClosePositionHandler : IRequestHandler<ClosePositionCommand,
     private readonly IPositionRepository _positionRepository;
     private readonly ITradeRepository _tradeRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IPlatformAdapter _platform;
 
     public ClosePositionHandler(
         IPositionRepository positionRepository,
         ITradeRepository tradeRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IPlatformAdapter platform)
     {
         _positionRepository = positionRepository;
         _tradeRepository = tradeRepository;
         _unitOfWork = unitOfWork;
+        _platform = platform;
     }
 
     public async Task<Result<Money>> Handle(ClosePositionCommand request, CancellationToken cancellationToken)
@@ -51,6 +55,9 @@ public sealed class ClosePositionHandler : IRequestHandler<ClosePositionCommand,
             position.StrategyName,
             position.Platform,
             duration);
+
+        var proceeds = request.ExitPrice.Amount * position.Quantity;
+        await _platform.CreditBalanceAsync(proceeds, cancellationToken);
 
         _positionRepository.Update(position);
         await _tradeRepository.AddAsync(trade, cancellationToken);

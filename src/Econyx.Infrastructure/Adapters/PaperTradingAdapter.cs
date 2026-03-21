@@ -97,6 +97,20 @@ internal sealed partial class PaperTradingAdapter : IPlatformAdapter, IDisposabl
         }
     }
 
+    public async Task CreditBalanceAsync(decimal amount, CancellationToken ct = default)
+    {
+        await _lock.WaitAsync(ct);
+        try
+        {
+            _balance += amount;
+            LogBalanceCredited(_logger, amount, _balance);
+        }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
     public void Dispose() => _lock.Dispose();
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "[Paper] Insufficient balance. Required: {Cost}, Available: {Balance}")]
@@ -107,4 +121,7 @@ internal sealed partial class PaperTradingAdapter : IPlatformAdapter, IDisposabl
 
     [LoggerMessage(Level = LogLevel.Information, Message = "[Paper] Order cancelled: {OrderId}")]
     private static partial void LogOrderCancelled(ILogger logger, string orderId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "[Paper] Balance credited: +{Amount} | Balance: {Balance}")]
+    private static partial void LogBalanceCredited(ILogger logger, decimal amount, decimal balance);
 }

@@ -76,7 +76,27 @@ public sealed class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Resul
         }
         else
         {
-            order.Fill(marketPrice, order.Quantity);
+            try
+            {
+                var platformOrderId = await _platform.PlaceOrderAsync(
+                    new PlaceOrderRequest(
+                        signal.TokenId,
+                        signal.RecommendedSide,
+                        signal.MarketPrice.Value,
+                        order.Quantity,
+                        OrderType.Limit),
+                    cancellationToken);
+
+                order.SetPlatformOrderId(platformOrderId);
+                order.Fill(marketPrice, order.Quantity);
+            }
+            catch (InvalidOperationException ex)
+            {
+                order.Reject(ex.Message);
+                await _orderRepository.AddAsync(order, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                return Result.Failure<Guid>(Error.Failure($"Insufficient balance: {ex.Message}"));
+            }
         }
 
         var position = Position.Create(
