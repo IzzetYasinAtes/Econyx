@@ -1,39 +1,44 @@
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using OpenAI;
 using Econyx.Application.Ports;
+using Econyx.Application.Configuration;
 using Econyx.Infrastructure.AiServices.PromptTemplates;
 
 namespace Econyx.Infrastructure.AiServices.OpenRouter;
 
 internal sealed partial class OpenRouterAnalysisService : IAiAnalysisService
 {
-    private readonly IChatClient _chatClient;
     private readonly AiResponseCache _cache;
     private readonly ILogger<OpenRouterAnalysisService> _logger;
+    private readonly string _baseUrl;
 
     private string _modelId = "anthropic/claude-sonnet-4-20250514";
+    private string _apiKey = string.Empty;
     private int _maxTokens = 4096;
     private decimal _promptPricePer1M;
     private decimal _completionPricePer1M;
 
     public OpenRouterAnalysisService(
-        IChatClient chatClient,
         AiResponseCache cache,
+        IOptions<AiOptions> aiOptions,
         ILogger<OpenRouterAnalysisService> logger)
     {
-        _chatClient = chatClient;
         _cache = cache;
         _logger = logger;
+        _baseUrl = aiOptions.Value.OpenRouter.BaseUrl;
     }
 
     public string ProviderName => $"OpenRouter ({_modelId})";
 
-    public void Configure(string modelId, int maxTokens, decimal promptPricePer1M, decimal completionPricePer1M)
+    public void Configure(string modelId, int maxTokens, decimal promptPricePer1M, decimal completionPricePer1M, string apiKey)
     {
         _modelId = modelId;
         _maxTokens = maxTokens;
         _promptPricePer1M = promptPricePer1M;
         _completionPricePer1M = completionPricePer1M;
+        _apiKey = apiKey;
     }
 
     public async Task<FairValueResult> AnalyzeMarketAsync(MarketAnalysisRequest request, CancellationToken ct = default)
@@ -61,7 +66,15 @@ internal sealed partial class OpenRouterAnalysisService : IAiAnalysisService
             ModelId = _modelId
         };
 
-        var response = await _chatClient.GetResponseAsync(messages, chatOptions, ct);
+        var client = new OpenAIClient(
+            new System.ClientModel.ApiKeyCredential(_apiKey),
+            new OpenAIClientOptions
+            {
+                Endpoint = new Uri(_baseUrl)
+            });
+
+        var chatClient = client.GetChatClient(_modelId).AsIChatClient();
+        var response = await chatClient.GetResponseAsync(messages, chatOptions, ct);
 
         var responseText = response.Text ?? "{}";
         var inputTokens = response.Usage?.InputTokenCount ?? 0;

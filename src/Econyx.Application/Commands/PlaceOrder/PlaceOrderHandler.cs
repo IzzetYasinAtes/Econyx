@@ -31,6 +31,12 @@ public sealed class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Resul
     public async Task<Result<Guid>> Handle(PlaceOrderCommand request, CancellationToken cancellationToken)
     {
         var signal = request.Signal;
+        if (signal.MarketPrice.Value <= 0)
+        {
+            return Result.Failure<Guid>(
+                Error.Validation("Market price must be greater than zero to place an order."));
+        }
+
         var marketPrice = Money.Create(signal.MarketPrice.Value);
         var quantity = request.PositionSize.Amount / signal.MarketPrice.Value;
 
