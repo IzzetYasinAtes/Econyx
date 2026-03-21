@@ -68,7 +68,7 @@ else
                                                  Items="_balanceHistory"
                                                  SeriesType="SeriesType.Area"
                                                  Name="Total Portfolio"
-                                                 XValue="@(p => p.Timestamp.ToString("HH:mm"))"
+                                                 XValue="@(p => p.Timestamp.ToLocalTime().ToString("HH:mm"))"
                                                  YValue="@(p => p.Balance)" />
                             </ApexChart>
                         }

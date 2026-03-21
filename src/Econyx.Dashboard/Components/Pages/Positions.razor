@@ -50,7 +50,7 @@ else
                             @FormatPnL(p.UnrealizedPnL.Amount)
                         </td>
                         <td class="text-muted">@p.StrategyName</td>
-                        <td class="mono text-muted">@p.OpenedAt.ToString("MM/dd HH:mm")</td>
+                        <td class="mono text-muted">@p.OpenedAt.ToLocalTime().ToString("MM/dd HH:mm")</td>
                     </tr>
                 }
             </tbody>

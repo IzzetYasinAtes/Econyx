@@ -56,7 +56,7 @@ else
                             <td class="mono @PnLClass(t.PnL.Amount)">@FormatPnL(t.PnL.Amount)</td>
                             <td class="mono text-muted">@FormatDuration(t.Duration)</td>
                             <td class="text-muted">@t.StrategyName</td>
-                            <td class="mono text-muted">@t.ClosedAt.ToString("MM/dd HH:mm")</td>
+                            <td class="mono text-muted">@t.ClosedAt.ToLocalTime().ToString("MM/dd HH:mm")</td>
                         </tr>
                     }
                 </tbody>
