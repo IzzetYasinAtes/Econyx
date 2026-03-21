@@ -122,7 +122,7 @@ internal sealed partial class AiProviderFactory : IAiProviderFactory
         string modelId, int maxTokens, decimal promptPrice, decimal completionPrice, string apiKey)
     {
         var service = _serviceProvider.GetRequiredService<OpenRouterAnalysisService>();
-        service.Configure(modelId, maxTokens, promptPrice, completionPrice);
+        service.Configure(modelId, maxTokens, promptPrice, completionPrice, apiKey);
         return service;
     }
 

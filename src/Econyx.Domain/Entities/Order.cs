@@ -67,7 +67,7 @@ public sealed class Order : BaseEntity<Guid>
         if (Status is not (OrderStatus.Pending or OrderStatus.PartiallyFilled))
             throw new InvalidOperationException($"Cannot fill order in {Status} status.");
 
-        FilledPrice = price;
+        FilledPrice = Money.Create(price.Amount, price.Currency);
         FilledQuantity = (FilledQuantity ?? 0) + quantity;
         FilledAt = DateTime.UtcNow;
 

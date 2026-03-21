@@ -49,8 +49,8 @@ public sealed class Position : AggregateRoot<Guid>
             TokenId = tokenId,
             Platform = platform,
             Side = side,
-            EntryPrice = entryPrice,
-            CurrentPrice = entryPrice,
+            EntryPrice = Money.Create(entryPrice.Amount, entryPrice.Currency),
+            CurrentPrice = Money.Create(entryPrice.Amount, entryPrice.Currency),
             Quantity = quantity,
             StrategyName = strategyName,
             IsOpen = true
@@ -64,7 +64,7 @@ public sealed class Position : AggregateRoot<Guid>
         if (!IsOpen)
             throw new InvalidOperationException("Cannot update price on a closed position.");
 
-        CurrentPrice = currentPrice;
+        CurrentPrice = Money.Create(currentPrice.Amount, currentPrice.Currency);
         IncrementVersion();
     }
 
@@ -75,8 +75,8 @@ public sealed class Position : AggregateRoot<Guid>
         if (!IsOpen)
             throw new InvalidOperationException("Position is already closed.");
 
-        ExitPrice = exitPrice;
-        CurrentPrice = exitPrice;
+        ExitPrice = Money.Create(exitPrice.Amount, exitPrice.Currency);
+        CurrentPrice = Money.Create(exitPrice.Amount, exitPrice.Currency);
         IsOpen = false;
         ClosedAt = DateTime.UtcNow;
         IncrementVersion();

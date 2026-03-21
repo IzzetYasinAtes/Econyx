@@ -137,22 +137,10 @@ public static class DependencyInjection
             client.DefaultRequestHeaders.Add("X-Title", "Econyx Trading Bot");
         });
 
-        services.AddKeyedSingleton<IChatClient>("openrouter", (sp, _) =>
-        {
-            var orApiKey = Environment.GetEnvironmentVariable("OPENROUTER_API_KEY") ?? string.Empty;
-            var orClient = new OpenAIClient(
-                new System.ClientModel.ApiKeyCredential(orApiKey),
-                new OpenAI.OpenAIClientOptions
-                {
-                    Endpoint = new Uri(aiOptions.OpenRouter.BaseUrl)
-                });
-            return orClient.GetChatClient(aiOptions.OpenRouter.DefaultModel).AsIChatClient();
-        });
-
         services.AddSingleton<OpenRouterAnalysisService>(sp =>
             new OpenRouterAnalysisService(
-                sp.GetRequiredKeyedService<IChatClient>("openrouter"),
                 sp.GetRequiredService<AiResponseCache>(),
+                Microsoft.Extensions.Options.Options.Create(aiOptions),
                 sp.GetRequiredService<ILogger<OpenRouterAnalysisService>>()));
 
         services.AddSingleton<IAiProviderFactory, AiProviderFactory>();
