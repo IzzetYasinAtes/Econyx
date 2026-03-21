@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build*)",
+      "Bash(dotnet test*)",
+      "Bash(dotnet run*)",
+      "Bash(dotnet ef*)",
+      "Bash(dotnet format*)",
+      "Bash(dotnet clean*)",
+      "Bash(dotnet restore*)",
+      "Bash(dotnet add*)",
+      "Bash(dotnet list*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(git stash*)",
+      "Bash(git fetch*)",
+      "Bash(git pull*)",
+      "Bash(git merge*)",
+      "Bash(git rebase*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git tag*)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(claude mcp*)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "MCP(github:*)",
+      "MCP(sequential-thinking:*)",
+      "MCP(context7:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(dotnet publish*)"
+    ]
+  }
+}
