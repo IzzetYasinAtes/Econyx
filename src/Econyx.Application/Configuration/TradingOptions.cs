@@ -17,4 +17,5 @@ public sealed class TradingOptions
     public decimal StopLossPercent { get; set; } = 50m;
     public decimal TakeProfitPercent { get; set; } = 100m;
     public decimal SurvivalModeThresholdUsd { get; set; } = 20m;
+    public int MaxAiCandidates { get; set; } = 20;
 }

@@ -1,16 +1,23 @@
 namespace Econyx.Application.Strategies;
 
+using Econyx.Application.Configuration;
 using Econyx.Domain.Entities;
+using Microsoft.Extensions.Options;
 
 public sealed class HybridStrategy : IStrategy
 {
     private readonly RuleBasedStrategy _ruleStrategy;
     private readonly AiAnalysisStrategy _aiStrategy;
+    private readonly TradingOptions _options;
 
-    public HybridStrategy(RuleBasedStrategy ruleStrategy, AiAnalysisStrategy aiStrategy)
+    public HybridStrategy(
+        RuleBasedStrategy ruleStrategy,
+        AiAnalysisStrategy aiStrategy,
+        IOptions<TradingOptions> options)
     {
         _ruleStrategy = ruleStrategy;
         _aiStrategy = aiStrategy;
+        _options = options.Value;
     }
 
     public string Name => "Hybrid";
@@ -24,8 +31,16 @@ public sealed class HybridStrategy : IStrategy
         if (ruleSignals.Count == 0)
             return ruleSignals;
 
-        var filteredMarketIds = ruleSignals.Select(s => s.MarketId).ToHashSet();
-        var filteredMarkets = markets.Where(m => filteredMarketIds.Contains(m.Id)).ToList();
+        var filteredMarketIds = ruleSignals
+            .OrderByDescending(s => s.Edge.AbsoluteValue)
+            .Select(s => s.MarketId)
+            .Distinct()
+            .Take(_options.MaxAiCandidates)
+            .ToHashSet();
+
+        var filteredMarkets = markets
+            .Where(m => filteredMarketIds.Contains(m.Id))
+            .ToList();
 
         var aiSignals = await _aiStrategy.EvaluateAsync(filteredMarkets, ct);
 

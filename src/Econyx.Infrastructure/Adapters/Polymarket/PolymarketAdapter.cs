@@ -1,8 +1,10 @@
 namespace Econyx.Infrastructure.Adapters.Polymarket;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using global::Polymarket.Net.Enums;
 using global::Polymarket.Net.Interfaces.Clients;
+using Econyx.Application.Configuration;
 using Econyx.Application.Ports;
 using Econyx.Domain.Entities;
 using Econyx.Domain.Enums;
@@ -12,30 +14,52 @@ internal sealed partial class PolymarketAdapter : IPlatformAdapter
 {
     private readonly IPolymarketRestClient _client;
     private readonly ILogger<PolymarketAdapter> _logger;
+    private readonly decimal _minVolumeUsd;
 
-    public PolymarketAdapter(IPolymarketRestClient client, ILogger<PolymarketAdapter> logger)
+    public PolymarketAdapter(
+        IPolymarketRestClient client,
+        ILogger<PolymarketAdapter> logger,
+        IOptions<TradingOptions> tradingOptions)
     {
         _client = client;
         _logger = logger;
+        _minVolumeUsd = tradingOptions.Value.MinVolumeUsd;
     }
 
     public PlatformType Platform => PlatformType.Polymarket;
 
     public async Task<IReadOnlyList<Market>> GetMarketsAsync(CancellationToken ct = default)
     {
-        var result = await _client.GammaApi.GetEventsAsync(closed: false, ct: ct);
-        if (!result.Success)
-        {
-            LogGetEventsFailed(_logger, result.Error?.ToString());
-            return [];
-        }
-
+        const int pageSize = 500;
         var markets = new List<Market>();
-        foreach (var evt in result.Data)
+        var offset = 0;
+
+        while (!ct.IsCancellationRequested)
         {
-            var mapped = PolymarketMapper.ToDomainMarket(evt);
-            if (mapped is not null)
-                markets.Add(mapped);
+            var result = await _client.GammaApi.GetEventsAsync(
+                closed: false, active: true, volumeMin: _minVolumeUsd,
+                limit: pageSize, offset: offset, ct: ct);
+
+            if (!result.Success)
+            {
+                LogGetEventsFailed(_logger, result.Error?.ToString());
+                break;
+            }
+
+            if (result.Data is null || result.Data.Length == 0)
+                break;
+
+            foreach (var evt in result.Data)
+            {
+                var mapped = PolymarketMapper.ToDomainMarket(evt);
+                if (mapped is not null)
+                    markets.Add(mapped);
+            }
+
+            if (result.Data.Length < pageSize)
+                break;
+
+            offset += pageSize;
         }
 
         LogMarketsFetched(_logger, markets.Count);

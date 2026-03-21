@@ -38,7 +38,7 @@ public sealed class HybridStrategyTests
         var mockFactory = new Mock<IAiProviderFactory>();
         var ruleStrategy = new RuleBasedStrategy(Options.Create(_options));
         var aiStrategy = new AiAnalysisStrategy(mockFactory.Object, Options.Create(_options));
-        var hybrid = new HybridStrategy(ruleStrategy, aiStrategy);
+        var hybrid = new HybridStrategy(ruleStrategy, aiStrategy, Options.Create(_options));
 
         hybrid.Name.Should().Be("Hybrid");
     }
@@ -49,7 +49,7 @@ public sealed class HybridStrategyTests
         var mockFactory = new Mock<IAiProviderFactory>();
         var ruleStrategy = new RuleBasedStrategy(Options.Create(_options));
         var aiStrategy = new AiAnalysisStrategy(mockFactory.Object, Options.Create(_options));
-        var hybrid = new HybridStrategy(ruleStrategy, aiStrategy);
+        var hybrid = new HybridStrategy(ruleStrategy, aiStrategy, Options.Create(_options));
 
         var market = CreateMarket(yesPrice: 0.50m);
 
@@ -77,7 +77,7 @@ public sealed class HybridStrategyTests
 
         var ruleStrategy = new RuleBasedStrategy(Options.Create(_options));
         var aiStrategy = new AiAnalysisStrategy(mockFactory.Object, Options.Create(_options));
-        var hybrid = new HybridStrategy(ruleStrategy, aiStrategy);
+        var hybrid = new HybridStrategy(ruleStrategy, aiStrategy, Options.Create(_options));
 
         var signals = await hybrid.EvaluateAsync([market]);
 
