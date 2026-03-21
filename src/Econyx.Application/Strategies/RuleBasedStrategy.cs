@@ -26,15 +26,19 @@ public sealed class RuleBasedStrategy : IStrategy
         var eligible = markets.Where(m =>
             m.Status == MarketStatus.Open &&
             m.VolumeUsd >= _options.MinVolumeUsd &&
-            m.Spread <= _options.MaxSpreadCents / 100m);
+            m.Spread <= _options.MaxSpreadCents / 100m &&
+            m.Outcomes.Count == 2);
 
         foreach (var market in eligible)
         {
+            ct.ThrowIfCancellationRequested();
+
+            StrategySignal? bestSignal = null;
+
             foreach (var outcome in market.Outcomes)
             {
-                ct.ThrowIfCancellationRequested();
-
                 var price = outcome.Price.Value;
+                StrategySignal? candidate = null;
 
                 if (price < 0.15m)
                 {
@@ -42,7 +46,7 @@ public sealed class RuleBasedStrategy : IStrategy
 
                     if (buyEdge >= _options.MinEdgeThreshold)
                     {
-                        signals.Add(new StrategySignal(
+                        candidate = new StrategySignal(
                             market.Id,
                             market.Question,
                             outcome.Token.Value,
@@ -52,7 +56,7 @@ public sealed class RuleBasedStrategy : IStrategy
                             outcome.Price,
                             0.6m,
                             Name,
-                            $"Price {price:P1} below 15% threshold, potential value buy on '{outcome.Name}'"));
+                            $"Price {price:P1} below 15% threshold, potential value buy on '{outcome.Name}'");
                     }
                 }
                 else if (price > 0.85m)
@@ -61,7 +65,7 @@ public sealed class RuleBasedStrategy : IStrategy
 
                     if (sellEdge >= _options.MinEdgeThreshold)
                     {
-                        signals.Add(new StrategySignal(
+                        candidate = new StrategySignal(
                             market.Id,
                             market.Question,
                             outcome.Token.Value,
@@ -71,10 +75,19 @@ public sealed class RuleBasedStrategy : IStrategy
                             outcome.Price,
                             0.6m,
                             Name,
-                            $"Price {price:P1} above 85% threshold, potential fade on '{outcome.Name}'"));
+                            $"Price {price:P1} above 85% threshold, potential fade on '{outcome.Name}'");
                     }
                 }
+
+                if (candidate is not null &&
+                    (bestSignal is null || candidate.Edge.AbsoluteValue > bestSignal.Edge.AbsoluteValue))
+                {
+                    bestSignal = candidate;
+                }
             }
+
+            if (bestSignal is not null)
+                signals.Add(bestSignal);
         }
 
         return Task.FromResult<IReadOnlyList<StrategySignal>>(signals);
