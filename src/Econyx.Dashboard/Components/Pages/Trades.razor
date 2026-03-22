@@ -50,9 +50,9 @@ else
                                     @t.Side
                                 </span>
                             </td>
-                            <td class="mono">$@t.EntryPrice.Amount.ToString("F2")</td>
-                            <td class="mono">$@t.ExitPrice.Amount.ToString("F2")</td>
-                            <td class="mono">@t.Quantity.ToString("F2")</td>
+                            <td class="mono">$@t.EntryPrice.Amount.ToString("F4")</td>
+                            <td class="mono">$@t.ExitPrice.Amount.ToString("F4")</td>
+                            <td class="mono">@t.Quantity.ToString("N0")</td>
                             <td class="mono @PnLClass(t.PnL.Amount)">@FormatPnL(t.PnL.Amount)</td>
                             <td class="mono text-muted">@FormatDuration(t.Duration)</td>
                             <td class="text-muted">@t.StrategyName</td>

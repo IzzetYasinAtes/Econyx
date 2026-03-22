@@ -6,7 +6,9 @@
 @using Econyx.Application.Queries.GetActiveAiConfig
 @using Econyx.Application.Queries.GetAvailableModels
 @using Econyx.Application.Commands.SaveApiKey
+@using Econyx.Application.Commands.SaveTradingConfig
 @using Econyx.Application.Queries.GetApiKeyStatus
+@using Econyx.Application.Queries.GetTradingConfig
 @using Econyx.Domain.Enums
 @using MediatR
 @inject IOptions<TradingOptions> TradingOpts
@@ -152,18 +154,94 @@
                 @L["Settings_Trading"]
             </div>
             <div class="settings-list">
-                <SettingRow Label="@L["Settings_Mode"]" Value="@_trading.Mode.ToString()"
-                            ValueColor="@(_trading.Mode == TradingMode.Paper ? "var(--yellow)" : "var(--green)")" />
-                <SettingRow Label="@L["Settings_InitialBalance"]" Value="@($"${_trading.InitialBalance:F2}")" />
-                <SettingRow Label="@L["Settings_ScanInterval"]" Value="@($"{_trading.ScanIntervalMinutes} min")" />
-                <SettingRow Label="@L["Settings_MaxPositions"]" Value="@_trading.MaxOpenPositions.ToString()" />
-                <SettingRow Label="@L["Settings_PositionSize"]" Value="@($"{_trading.MaxPositionSizePercent}%")" />
-                <SettingRow Label="@L["Settings_MinEdge"]" Value="@($"{_trading.MinEdgeThreshold:P0}")" />
-                <SettingRow Label="@L["Settings_MinVolume"]" Value="@($"${_trading.MinVolumeUsd:N0}")" />
-                <SettingRow Label="@L["Settings_MaxSpread"]" Value="@($"{_trading.MaxSpreadCents}¢")" />
-                <SettingRow Label="@L["Settings_StopLoss"]" Value="@($"{_trading.StopLossPercent}%")" />
-                <SettingRow Label="@L["Settings_TakeProfit"]" Value="@($"{_trading.TakeProfitPercent}%")" />
-                <SettingRow Label="@L["Settings_Survival"]" Value="@($"${_trading.SurvivalModeThresholdUsd:F2}")" />
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_Mode"]</label>
+                    <div class="setting-input-group">
+                        <select class="form-input form-input-sm" @bind="_tcMode">
+                            <option value="Paper">Paper</option>
+                            <option value="Live">Live</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_InitialBalance"]</label>
+                    <div class="setting-input-group">
+                        <input type="number" class="form-input form-input-sm" @bind="_tcInitialBalance" step="10" min="1" />
+                        <span class="setting-unit">$</span>
+                    </div>
+                </div>
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_ScanInterval"]</label>
+                    <div class="setting-input-group">
+                        <input type="number" class="form-input form-input-sm" @bind="_tcScanInterval" step="1" min="1" max="60" />
+                        <span class="setting-unit">min</span>
+                    </div>
+                </div>
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_MaxPositions"]</label>
+                    <div class="setting-input-group">
+                        <input type="number" class="form-input form-input-sm" @bind="_tcMaxPositions" step="1" min="1" max="50" />
+                    </div>
+                </div>
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_PositionSize"]</label>
+                    <div class="setting-input-group">
+                        <input type="number" class="form-input form-input-sm" @bind="_tcPositionSize" step="1" min="1" max="25" />
+                        <span class="setting-unit">%</span>
+                    </div>
+                </div>
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_MinEdge"]</label>
+                    <div class="setting-input-group">
+                        <input type="number" class="form-input form-input-sm" @bind="_tcMinEdge" step="0.01" min="0.01" max="0.50" />
+                    </div>
+                </div>
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_MinVolume"]</label>
+                    <div class="setting-input-group">
+                        <input type="number" class="form-input form-input-sm" @bind="_tcMinVolume" step="1000" min="0" />
+                        <span class="setting-unit">$</span>
+                    </div>
+                </div>
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_MaxSpread"]</label>
+                    <div class="setting-input-group">
+                        <input type="number" class="form-input form-input-sm" @bind="_tcMaxSpread" step="1" min="1" max="20" />
+                        <span class="setting-unit">c</span>
+                    </div>
+                </div>
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_StopLoss"]</label>
+                    <div class="setting-input-group">
+                        <input type="number" class="form-input form-input-sm" @bind="_tcStopLoss" step="1" min="1" max="50" />
+                        <span class="setting-unit">%</span>
+                    </div>
+                </div>
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_TakeProfit"]</label>
+                    <div class="setting-input-group">
+                        <input type="number" class="form-input form-input-sm" @bind="_tcTakeProfit" step="1" min="1" max="200" />
+                        <span class="setting-unit">%</span>
+                    </div>
+                </div>
+                <div class="setting-edit-row">
+                    <label class="setting-label mono">@L["Settings_Survival"]</label>
+                    <div class="setting-input-group">
+                        <input type="number" class="form-input form-input-sm" @bind="_tcSurvival" step="5" min="1" />
+                        <span class="setting-unit">$</span>
+                    </div>
+                </div>
+                <button class="btn-save" style="margin-top: 0.5rem;" @onclick="SaveTradingConfigAsync" disabled="@_tradingSaving">
+                    @(_tradingSaving ? "..." : L["Save"])
+                </button>
+                @if (_tradingSaveSuccess)
+                {
+                    <span class="status-badge success mono" style="margin-left: 0.5rem;">@L["Saved"]</span>
+                }
+                @if (!string.IsNullOrEmpty(_tradingSaveError))
+                {
+                    <div class="save-error">@_tradingSaveError</div>
+                }
             </div>
         </div>
 
@@ -241,6 +319,22 @@
     private bool _keySaveSuccess;
     private string? _keySaveError;
 
+    // Trading config editable fields
+    private string _tcMode = "Paper";
+    private decimal _tcInitialBalance;
+    private int _tcScanInterval;
+    private int _tcMaxPositions;
+    private decimal _tcPositionSize;
+    private decimal _tcMinEdge;
+    private decimal _tcMinVolume;
+    private decimal _tcMaxSpread;
+    private decimal _tcStopLoss;
+    private decimal _tcTakeProfit;
+    private decimal _tcSurvival;
+    private bool _tradingSaving;
+    private bool _tradingSaveSuccess;
+    private string? _tradingSaveError;
+
     private List<OpenRouterModelDto> _filteredModels =>
         string.IsNullOrWhiteSpace(_searchText)
             ? _allModels
@@ -253,6 +347,19 @@
     {
         _trading = TradingOpts.Value;
         _ai = AiOpts.Value;
+
+        var tradingConfig = await Mediator.Send(new GetTradingConfigQuery());
+        _tcMode = tradingConfig.Mode.ToString();
+        _tcInitialBalance = tradingConfig.InitialBalance;
+        _tcScanInterval = tradingConfig.ScanIntervalMinutes;
+        _tcMaxPositions = tradingConfig.MaxOpenPositions;
+        _tcPositionSize = tradingConfig.MaxPositionSizePercent;
+        _tcMinEdge = tradingConfig.MinEdgeThreshold;
+        _tcMinVolume = tradingConfig.MinVolumeUsd;
+        _tcMaxSpread = tradingConfig.MaxSpreadCents;
+        _tcStopLoss = tradingConfig.StopLossPercent;
+        _tcTakeProfit = tradingConfig.TakeProfitPercent;
+        _tcSurvival = tradingConfig.SurvivalModeThresholdUsd;
 
         _activeConfig = await Mediator.Send(new GetActiveAiConfigQuery());
 
@@ -369,5 +476,26 @@
         }
         catch (Exception ex) { _keySaveError = ex.Message; }
         finally { _keySaving = false; }
+    }
+
+    private async Task SaveTradingConfigAsync()
+    {
+        _tradingSaving = true; _tradingSaveSuccess = false; _tradingSaveError = null;
+        StateHasChanged();
+        try
+        {
+            var mode = Enum.Parse<TradingMode>(_tcMode);
+            var result = await Mediator.Send(new SaveTradingConfigCommand(
+                mode, _tcInitialBalance, _tcScanInterval,
+                _tcMaxPositions, _tcPositionSize, _tcMinEdge,
+                _tcMinVolume, _tcMaxSpread, _tcStopLoss,
+                _tcTakeProfit, _tcSurvival, 20));
+            if (result.IsSuccess)
+                _tradingSaveSuccess = true;
+            else
+                _tradingSaveError = result.Error.Message;
+        }
+        catch (Exception ex) { _tradingSaveError = ex.Message; }
+        finally { _tradingSaving = false; }
     }
 }

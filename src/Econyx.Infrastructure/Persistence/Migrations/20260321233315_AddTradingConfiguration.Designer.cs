@@ -4,6 +4,7 @@ using Econyx.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Econyx.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(EconyxDbContext))]
-    partial class EconyxDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260321233315_AddTradingConfiguration")]
+    partial class AddTradingConfiguration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

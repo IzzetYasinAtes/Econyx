@@ -23,7 +23,7 @@ public sealed class GetBalanceHistoryHandler : IRequestHandler<GetBalanceHistory
 
         return snapshots
             .OrderBy(s => s.CreatedAt)
-            .Select(s => new BalanceHistoryPoint(s.CreatedAt, s.Balance.Amount + s.TotalPnL.Amount))
+            .Select(s => new BalanceHistoryPoint(s.CreatedAt, s.Balance.Amount))
             .ToList();
     }
 }

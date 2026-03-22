@@ -29,7 +29,7 @@ internal static class MarketAnalysisPrompt
             2. Estimate the fair probability (0.0 to 1.0) for EACH outcome.
             3. Probabilities should sum to approximately 1.0 for binary markets.
             4. Provide a confidence score (0.0 to 1.0) reflecting how certain you are in your estimates.
-            5. Explain your reasoning in 2-4 sentences.
+            5. Explain your reasoning in 1 sentence.
 
             ## Response Format
             Respond ONLY with valid JSON in this exact format (no markdown, no code fences):
