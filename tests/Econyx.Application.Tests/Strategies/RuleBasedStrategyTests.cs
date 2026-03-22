@@ -52,32 +52,32 @@ public sealed class RuleBasedStrategyTests
     }
 
     [Fact]
-    public async Task EvaluateAsync_ShouldGenerateBuySignal_WhenPriceBelow15Percent()
+    public async Task EvaluateAsync_ShouldGenerateBuySignal_WhenPriceInUnderpricedZone()
     {
-        var market = CreateMarket(yesPrice: 0.08m);
+        var market = CreateMarket(yesPrice: 0.30m);
         var strategy = CreateStrategy();
 
         var signals = await strategy.EvaluateAsync([market]);
 
-        var buySignal = signals.First(s => s.TokenId == "tok-yes");
-        buySignal.RecommendedSide.Should().Be(TradeSide.Yes);
-        buySignal.MarketId.Should().Be(market.Id);
-        buySignal.StrategyName.Should().Be("RuleBased");
+        signals.Should().ContainSingle();
+        signals[0].TokenId.Should().Be("tok-yes");
+        signals[0].RecommendedSide.Should().Be(TradeSide.Yes);
+        signals[0].StrategyName.Should().Be("RuleBased");
     }
 
     [Fact]
-    public async Task EvaluateAsync_ShouldBuyComplementaryToken_WhenPriceAbove85Percent()
+    public async Task EvaluateAsync_ShouldBuyComplementaryToken_WhenPriceInOverpricedZone()
     {
-        var market = CreateMarket(yesPrice: 0.95m);
+        var market = CreateMarket(yesPrice: 0.70m);
         var strategy = CreateStrategy();
 
         var signals = await strategy.EvaluateAsync([market]);
 
-        // Yes at 0.95 → buy complementary No token at 0.05
+        // Yes at 0.70 → buy complementary No token at 0.30
         signals.Should().ContainSingle();
         signals[0].TokenId.Should().Be("tok-no");
         signals[0].RecommendedSide.Should().Be(TradeSide.Yes);
-        signals[0].MarketPrice.Value.Should().Be(0.05m);
+        signals[0].MarketPrice.Value.Should().Be(0.30m);
     }
 
     [Fact]
@@ -125,9 +125,10 @@ public sealed class RuleBasedStrategyTests
     }
 
     [Fact]
-    public async Task EvaluateAsync_ShouldSkipSignals_WhenEdgeBelowThreshold()
+    public async Task EvaluateAsync_ShouldSkipSignals_WhenPriceOutsideTargetZone()
     {
-        var market = CreateMarket(yesPrice: 0.12m);
+        // Price at 0.08 is outside target zone (0.20-0.45), should be skipped
+        var market = CreateMarket(yesPrice: 0.08m);
         var strategy = CreateStrategy();
 
         var signals = await strategy.EvaluateAsync([market]);
@@ -140,17 +141,14 @@ public sealed class RuleBasedStrategyTests
     {
         var markets = new[]
         {
-            CreateMarket(yesPrice: 0.05m),
-            CreateMarket(yesPrice: 0.50m),
-            CreateMarket(yesPrice: 0.95m)
+            CreateMarket(yesPrice: 0.30m),    // Yes in underpriced zone → buy Yes
+            CreateMarket(yesPrice: 0.50m),    // Middle → no signal
+            CreateMarket(yesPrice: 0.70m)     // Yes in overpriced zone → buy No (complementary)
         };
         var strategy = CreateStrategy();
 
         var signals = await strategy.EvaluateAsync(markets);
 
-        // Market 1: Yes at 0.05 → buy Yes token
-        // Market 2: Yes at 0.50 → no signal (middle range)
-        // Market 3: Yes at 0.95 → buy complementary No token
         signals.Should().HaveCount(2);
         signals.Should().OnlyContain(s => s.RecommendedSide == TradeSide.Yes);
     }

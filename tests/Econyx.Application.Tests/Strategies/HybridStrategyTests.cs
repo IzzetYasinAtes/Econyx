@@ -61,13 +61,13 @@ public sealed class HybridStrategyTests
     [Fact]
     public async Task EvaluateAsync_ShouldCombineSignals_WhenBothAgree()
     {
-        var market = CreateMarket(yesPrice: 0.08m);
+        var market = CreateMarket(yesPrice: 0.30m);
 
         var mockAiService = new Mock<IAiAnalysisService>();
         mockAiService
             .Setup(x => x.AnalyzeMarketAsync(It.IsAny<MarketAnalysisRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new FairValueResult(
-                [new OutcomeFairValue("Yes", Probability.Create(0.20m))],
+                [new OutcomeFairValue("Yes", Probability.Create(0.50m))],
                 0.8m, "AI says buy", 0.01m));
 
         var mockFactory = new Mock<IAiProviderFactory>();

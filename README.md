@@ -110,7 +110,7 @@ Core  <--  Domain  <--  Application  <--  Infrastructure  <--  Worker / Dashboar
 
 ### Ring 3: Application
 
-- **Port Interfaces**: IPlatformAdapter, IAiAnalysisService, ISecretManager, INotificationService
+- **Port Interfaces**: IPlatformAdapter, IAiAnalysisService, ISecretManager
 - **CQRS**: ScanMarketsCommand, PlaceOrderCommand, ClosePositionCommand + Queries
 - **Strategy Engine**:
   - `RuleBasedStrategy` - Volume, spread, category filter (cost: 0)
@@ -314,7 +314,7 @@ Core  <--  Domain  <--  Application  <--  Infrastructure  <--  Worker / Dashboar
 
 ### Halka 3: Application
 
-- **Port Interface'ler**: IPlatformAdapter, IAiAnalysisService, ISecretManager, INotificationService
+- **Port Interface'ler**: IPlatformAdapter, IAiAnalysisService, ISecretManager
 - **CQRS**: ScanMarketsCommand, PlaceOrderCommand, ClosePositionCommand + Query'ler
 - **Strateji Motoru**:
   - `RuleBasedStrategy` - Hacim, spread, kategori filtresi (maliyet: 0)

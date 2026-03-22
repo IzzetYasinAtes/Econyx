@@ -49,8 +49,7 @@ public sealed class HybridStrategy : IStrategy
         foreach (var aiSignal in aiSignals)
         {
             var matchingRule = ruleSignals.FirstOrDefault(r =>
-                r.MarketId == aiSignal.MarketId &&
-                r.RecommendedSide == aiSignal.RecommendedSide);
+                r.MarketId == aiSignal.MarketId);
 
             if (matchingRule is null)
                 continue;

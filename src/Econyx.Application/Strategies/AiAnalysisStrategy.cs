@@ -32,7 +32,7 @@ public sealed class AiAnalysisStrategy : IStrategy
         {
             ct.ThrowIfCancellationRequested();
 
-            if (market.Status != MarketStatus.Open)
+            if (market.Status != MarketStatus.Open || market.Outcomes.Count != 2)
                 continue;
 
             var request = new MarketAnalysisRequest(
@@ -45,6 +45,8 @@ public sealed class AiAnalysisStrategy : IStrategy
 
             var result = await aiService.AnalyzeMarketAsync(request, ct);
 
+            StrategySignal? bestSignal = null;
+
             foreach (var outcome in result.Outcomes)
             {
                 var marketOutcome = market.Outcomes
@@ -54,25 +56,48 @@ public sealed class AiAnalysisStrategy : IStrategy
                     continue;
 
                 var edgeValue = outcome.FairValue.Value - marketOutcome.Price.Value;
-                var edge = Edge.Create(Math.Abs(edgeValue));
+                var absEdge = Math.Abs(edgeValue);
 
-                if (!edge.IsActionable(_options.MinEdgeThreshold))
+                if (absEdge < _options.MinEdgeThreshold)
                     continue;
 
-                var side = edgeValue > 0 ? TradeSide.Yes : TradeSide.No;
+                string tokenId;
+                decimal entryPrice;
 
-                signals.Add(new StrategySignal(
+                if (edgeValue > 0)
+                {
+
+                    tokenId = marketOutcome.Token.Value;
+                    entryPrice = marketOutcome.Price.Value;
+                }
+                else
+                {
+
+                    var comp = market.Outcomes.FirstOrDefault(o =>
+                        o.Token.Value != marketOutcome.Token.Value);
+                    if (comp is null) continue;
+                    tokenId = comp.Token.Value;
+                    entryPrice = comp.Price.Value;
+                }
+
+                var candidate = new StrategySignal(
                     market.Id,
                     market.Question,
-                    marketOutcome.Token.Value,
-                    side,
-                    edge,
+                    tokenId,
+                    TradeSide.Yes,
+                    Edge.Create(absEdge),
                     outcome.FairValue,
-                    marketOutcome.Price,
+                    Probability.Create(entryPrice),
                     result.Confidence,
                     Name,
-                    result.Reasoning));
+                    result.Reasoning);
+
+                if (bestSignal is null || absEdge > bestSignal.Edge.AbsoluteValue)
+                    bestSignal = candidate;
             }
+
+            if (bestSignal is not null)
+                signals.Add(bestSignal);
         }
 
         return signals;

@@ -187,12 +187,12 @@ When you're comfortable with the paper trading results:
 | `Trading:InitialBalance` | 50 | Starting paper balance in USD |
 | `Trading:ScanIntervalMinutes` | 5 | How often to scan markets |
 | `Trading:MaxOpenPositions` | 10 | Maximum simultaneous open positions |
-| `Trading:MaxPositionSizePercent` | 5 | Max % of balance per position |
+| `Trading:MaxPositionSizePercent` | 2 | Max % of balance per position |
 | `Trading:MinEdgeThreshold` | 0.06 | Minimum edge to enter a trade (6%) |
 | `Trading:MinVolumeUsd` | 5000 | Minimum market volume filter |
 | `Trading:MaxSpreadCents` | 5 | Maximum bid-ask spread in cents |
-| `Trading:StopLossPercent` | 15 | Close position if loss exceeds this % |
-| `Trading:TakeProfitPercent` | 25 | Close position if profit exceeds this % |
+| `Trading:StopLossPercent` | 30 | Close position if loss exceeds this % |
+| `Trading:TakeProfitPercent` | 50 | Close position if profit exceeds this % |
 | `Trading:SurvivalModeThresholdUsd` | 10 | Reduce activity below this balance |
 
 ## Tips for Better Results
@@ -201,7 +201,7 @@ When you're comfortable with the paper trading results:
 2. **Use a Good AI Model** - Claude Sonnet or GPT-4o provide the best fair value estimates
 3. **Don't Lower MinEdgeThreshold Too Much** - Below 5% edge, transaction costs eat into profits
 4. **Monitor Daily API Costs** - AI calls cost money; the dashboard shows your daily API spend
-5. **Keep MaxPositionSizePercent Low** - 5% per position protects against any single bad trade
+5. **Keep MaxPositionSizePercent Low** - 2% per position protects against any single bad trade
 6. **Watch High-Volume Markets** - More liquid markets have tighter spreads and better execution
 
 ## Troubleshooting
@@ -413,12 +413,12 @@ Kagit islem sonuclari sizi tatmin ettiginde:
 | `Trading:InitialBalance` | 50 | Baslangic kagit bakiyesi (USD) |
 | `Trading:ScanIntervalMinutes` | 5 | Piyasa tarama sikligi (dakika) |
 | `Trading:MaxOpenPositions` | 10 | Maksimum es zamanli acik pozisyon |
-| `Trading:MaxPositionSizePercent` | 5 | Pozisyon basina maks bakiye yuzdesi |
+| `Trading:MaxPositionSizePercent` | 2 | Pozisyon basina maks bakiye yuzdesi |
 | `Trading:MinEdgeThreshold` | 0.06 | Islem acmak icin min edge (%6) |
 | `Trading:MinVolumeUsd` | 5000 | Minimum piyasa hacmi filtresi |
 | `Trading:MaxSpreadCents` | 5 | Maksimum alim-satim farki (sent) |
-| `Trading:StopLossPercent` | 15 | Zarar bu yuzedeyi asarsa pozisyonu kapat |
-| `Trading:TakeProfitPercent` | 25 | Kar bu yuzedeyi asarsa pozisyonu kapat |
+| `Trading:StopLossPercent` | 30 | Zarar bu yuzedeyi asarsa pozisyonu kapat |
+| `Trading:TakeProfitPercent` | 50 | Kar bu yuzedeyi asarsa pozisyonu kapat |
 | `Trading:SurvivalModeThresholdUsd` | 10 | Bu bakiyenin altinda aktiviteyi azalt |
 
 ## Daha Iyi Sonuclar Icin Ipuclari
@@ -427,7 +427,7 @@ Kagit islem sonuclari sizi tatmin ettiginde:
 2. **Iyi Bir AI Model Kullanin** - Claude Sonnet veya GPT-4o en iyi fair value tahminlerini sunar
 3. **MinEdgeThreshold'u Cok Dusurmeyin** - %5 edge'in altinda islem maliyetleri karlari yer
 4. **Gunluk API Maliyetlerini Izleyin** - AI cagrilari paraya mal olur; dashboard gunluk API harcamanizi gosterir
-5. **MaxPositionSizePercent'i Dusuk Tutun** - Pozisyon basina %5, tek bir kotu islemden korur
+5. **MaxPositionSizePercent'i Dusuk Tutun** - Pozisyon basina %2, tek bir kotu islemden korur
 6. **Yuksek Hacimli Piyasalari Izleyin** - Daha likit piyasalarda spreadler daha dar, islem daha iyi
 
 ## Sorun Giderme
