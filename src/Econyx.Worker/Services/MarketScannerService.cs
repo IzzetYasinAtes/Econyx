@@ -108,6 +108,9 @@ public sealed class MarketScannerService : BackgroundService
 
         foreach (var signal in signalsToProcess)
         {
+            if (existingMarketIds.Contains(signal.MarketId))
+                continue;
+
             try
             {
                 var positionSize = RiskCalculator.CalculatePositionSize(
@@ -127,6 +130,7 @@ public sealed class MarketScannerService : BackgroundService
 
                 if (result.IsSuccess)
                 {
+                    existingMarketIds.Add(signal.MarketId);
                     _logger.LogInformation(
                         "Order placed — market: {Market}, size: {Size}, side: {Side}",
                         signal.MarketQuestion, positionSize, signal.RecommendedSide);

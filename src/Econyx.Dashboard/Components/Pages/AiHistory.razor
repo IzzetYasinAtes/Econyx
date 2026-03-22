@@ -44,7 +44,7 @@ else
                 <tbody>
                     @foreach (var log in _result.Items)
                     {
-                        <tr class="log-row @(_expandedId == log.Id ? "expanded" : "")"
+                        <tr class="log-row @(_expandedIds.Contains(log.Id) ? "expanded" : "")"
                             @onclick="() => ToggleExpand(log.Id)">
                             <td class="mono text-muted">@log.CreatedAt.ToLocalTime().ToString("MM/dd HH:mm")</td>
                             <td class="col-question" title="@log.MarketQuestion">@Truncate(log.MarketQuestion, 40)</td>
@@ -70,16 +70,16 @@ else
                                 }
                             </td>
                         </tr>
-                        @if (_expandedId == log.Id)
+                        @if (_expandedIds.Contains(log.Id))
                         {
                             <tr class="detail-row">
                                 <td colspan="9">
                                     <div class="detail-content">
-                                        @if (!string.IsNullOrEmpty(log.ParsedReasoning))
+                                        @if (!string.IsNullOrEmpty(log.Prompt))
                                         {
                                             <div class="detail-section">
-                                                <span class="detail-label">Reasoning:</span>
-                                                <span>@log.ParsedReasoning</span>
+                                                <span class="detail-label">Request:</span>
+                                                <pre class="response-json">@log.Prompt</pre>
                                             </div>
                                         }
                                         @if (!string.IsNullOrEmpty(log.Response))
@@ -120,7 +120,7 @@ else
     private AiLogsResult? _result;
     private int _page = 1;
     private const int PageSize = 20;
-    private Guid? _expandedId;
+    private readonly HashSet<Guid> _expandedIds = [];
     private int _totalPages => _result is null ? 1 : Math.Max(1, (int)Math.Ceiling(_result.TotalCount / (double)PageSize));
 
     protected override async Task OnInitializedAsync() => await LoadLogs();
@@ -134,7 +134,11 @@ else
     private async Task PrevPage() { _page = Math.Max(1, _page - 1); await LoadLogs(); }
     private async Task NextPage() { _page = Math.Min(_totalPages, _page + 1); await LoadLogs(); }
 
-    private void ToggleExpand(Guid id) => _expandedId = _expandedId == id ? null : id;
+    private void ToggleExpand(Guid id)
+    {
+        if (!_expandedIds.Remove(id))
+            _expandedIds.Add(id);
+    }
 
     private static string Truncate(string s, int max) =>
         s.Length <= max ? s : s[..max] + "...";
