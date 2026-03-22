@@ -46,7 +46,7 @@ Econyx runs as a set of background services that continuously scan prediction ma
 
 ## The Trading Cycle
 
-Every `ScanIntervalMinutes` (default: 5 minutes), the following cycle executes:
+Every `ScanIntervalMinutes` (default: 2 minutes), the following cycle executes:
 
 ### Step 1: Fetch Markets
 `MarketScannerService` triggers `ScanMarketsCommand`, which calls `IPlatformAdapter.GetMarketsAsync()` to fetch all open markets from Polymarket (~500+ markets at any time).
@@ -87,7 +87,7 @@ The rule-based strategy acts as a fast, free pre-filter. It looks for extreme pr
 
 **Filters applied before evaluation:**
 - `MarketStatus == Open`
-- `VolumeUsd >= MinVolumeUsd` (default: $5,000)
+- `VolumeUsd >= MinVolumeUsd` (default: $50,000)
 - `Spread <= MaxSpreadCents / 100` (default: 5 cents)
 - `edge >= MinEdgeThreshold` (default: 0.06)
 
@@ -258,8 +258,8 @@ pnlPercent = (pnl / entryAmount) * 100
 
 | Condition | Action | Default |
 |-----------|--------|---------|
-| `pnlPercent <= -StopLossPercent` | Close position (stop loss) | -30% |
-| `pnlPercent >= TakeProfitPercent` | Close position (take profit) | +50% |
+| `pnlPercent <= -StopLossPercent` | Close position (stop loss) | -15% |
+| `pnlPercent >= TakeProfitPercent` | Close position (take profit) | +25% |
 
 ### PnL Calculation
 
@@ -277,7 +277,7 @@ PnL depends on the trade direction:
 - PnL = (0.55 - 0.30) * 166.67 = $41.67
 - Entry amount = 0.30 * 166.67 = $50.00
 - PnL% = (41.67 / 50.00) * 100 = +83.3%
-- TakeProfitPercent = 50% → **Take profit triggered**, position closes
+- TakeProfitPercent = 25% → **Take profit triggered**, position closes
 
 ---
 
@@ -360,7 +360,7 @@ To reduce API costs, responses are cached for `CacheDurationMinutes` (default: 3
 
 | Service | Interval | Purpose |
 |---------|----------|---------|
-| `MarketScannerService` | 5 min | Scan markets, generate signals, place orders |
+| `MarketScannerService` | 2 min | Scan markets, generate signals, place orders |
 | `TradeExecutorService` | 30 sec | Check pending Live orders for fill status |
 | `PositionMonitorService` | 60 sec | Monitor open positions, trigger SL/TP |
 | `BalanceTrackerService` | periodic | Track balance snapshots over time |
@@ -374,14 +374,14 @@ To reduce API costs, responses are cached for `CacheDurationMinutes` (default: 3
 |-----------|---------|-------------|
 | `Mode` | Paper | Paper (simulated) or Live (real money) |
 | `InitialBalance` | $50 | Starting paper balance |
-| `ScanIntervalMinutes` | 5 | How often to scan markets |
-| `MaxOpenPositions` | 10 | Maximum simultaneous positions |
+| `ScanIntervalMinutes` | 2 | How often to scan markets |
+| `MaxOpenPositions` | 20 | Maximum simultaneous positions |
 | `MaxPositionSizePercent` | 2% | Kelly cap — max % of balance per trade |
 | `MinEdgeThreshold` | 0.06 | Minimum edge required (6%) |
-| `MinVolumeUsd` | $5,000 | Minimum 24h volume filter |
+| `MinVolumeUsd` | $50,000 | Minimum 24h volume filter |
 | `MaxSpreadCents` | 5 | Maximum bid-ask spread (cents) |
-| `StopLossPercent` | 30% | Close if loss exceeds this |
-| `TakeProfitPercent` | 50% | Close if profit exceeds this |
+| `StopLossPercent` | 15% | Close if loss exceeds this |
+| `TakeProfitPercent` | 25% | Close if profit exceeds this |
 | `SurvivalModeThresholdUsd` | $10 | Reduce activity below this balance |
 
 ---
@@ -390,14 +390,14 @@ To reduce API costs, responses are cached for `CacheDurationMinutes` (default: 3
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    MARKET SCANNING (Every 5 min)                │
+│                    MARKET SCANNING (Every 2 min)                │
 │                                                                 │
 │  Polymarket API → 500+ markets                                  │
 │       │                                                         │
 │       ▼                                                         │
 │  ┌─────────────────────────────────────────┐                    │
 │  │         RULE-BASED PRE-FILTER           │                    │
-│  │  • Volume >= $5,000                     │                    │
+│  │  • Volume >= $50,000                    │                    │
 │  │  • Spread <= 5¢                         │                    │
 │  │  • Price < 15¢ OR Price > 85¢           │                    │
 │  │  • Edge >= 6%                           │                    │
@@ -441,8 +441,8 @@ To reduce API costs, responses are cached for `CacheDurationMinutes` (default: 3
 │       ▼                                                         │
 │  Calculate PnL%                                                 │
 │       │                                                         │
-│       ├── PnL% <= -15% → STOP LOSS → Close position             │
-│       ├── PnL% >= +25% → TAKE PROFIT → Close position           │
+│       ├── PnL% <= -15% → STOP LOSS → Close position            │
+│       ├── PnL% >= +25% → TAKE PROFIT → Close position          │
 │       └── Otherwise → Continue monitoring                       │
 │                                                                 │
 │  On close: Trade record created with realized PnL               │
@@ -540,7 +540,7 @@ Econyx, tahmin piyasalarini surekli tarayan, hibrit AI + kural tabanli strateji 
 
 ## Islem Dongusu
 
-Her `ScanIntervalMinutes` (varsayilan: 5 dakika) suresinde asagidaki dongu calisir:
+Her `ScanIntervalMinutes` (varsayilan: 2 dakika) suresinde asagidaki dongu calisir:
 
 ### Adim 1: Piyasalari Cek
 `MarketScannerService`, `ScanMarketsCommand`'i tetikler. Bu komut `IPlatformAdapter.GetMarketsAsync()` ile Polymarket'ten tum acik piyasalari ceker (~500+ piyasa).
@@ -581,7 +581,7 @@ Kural tabanli strateji, hizli ve ucretsiz bir on-filtre gorevi gorur. Bir piyasa
 
 **Degerlendirme oncesi uygulanan filtreler:**
 - `MarketStatus == Open`
-- `VolumeUsd >= MinVolumeUsd` (varsayilan: $5,000)
+- `VolumeUsd >= MinVolumeUsd` (varsayilan: $50,000)
 - `Spread <= MaxSpreadCents / 100` (varsayilan: 5 sent)
 - `edge >= MinEdgeThreshold` (varsayilan: 0.06)
 
@@ -744,8 +744,8 @@ pnlYuzde = (pnl / girisUcreti) * 100
 
 | Kosul | Aksiyon | Varsayilan |
 |-------|---------|-----------|
-| `pnlYuzde <= -StopLossPercent` | Pozisyonu kapat (zarar durdur) | -%30 |
-| `pnlYuzde >= TakeProfitPercent` | Pozisyonu kapat (kar al) | +%50 |
+| `pnlYuzde <= -StopLossPercent` | Pozisyonu kapat (zarar durdur) | -%15 |
+| `pnlYuzde >= TakeProfitPercent` | Pozisyonu kapat (kar al) | +%25 |
 
 ### Kar/Zarar Hesaplama
 
@@ -763,7 +763,7 @@ Kar/zarar islem yonune baglidir:
 - PnL = (0.55 - 0.30) * 166.67 = $41.67
 - Giris tutari = 0.30 * 166.67 = $50.00
 - PnL% = (41.67 / 50.00) * 100 = +%83.3
-- TakeProfitPercent = %50 → Fiyat ~$0.10'a ulastiginda **kar al tetiklendi**, pozisyon kapandi
+- TakeProfitPercent = %25 → Fiyat ~$0.10'a ulastiginda **kar al tetiklendi**, pozisyon kapandi
 
 ---
 
@@ -822,7 +822,7 @@ API maliyetlerini azaltmak icin yanitlar `CacheDurationMinutes` (varsayilan: 30 
 
 | Servis | Aralik | Amac |
 |--------|--------|------|
-| `MarketScannerService` | 5 dk | Piyasalari tara, sinyal uret, emir ver |
+| `MarketScannerService` | 2 dk | Piyasalari tara, sinyal uret, emir ver |
 | `TradeExecutorService` | 30 sn | Live bekleyen emirlerin dolum durumunu kontrol et |
 | `PositionMonitorService` | 60 sn | Acik pozisyonlari izle, SL/TP tetikle |
 | `BalanceTrackerService` | periyodik | Zaman icinde bakiye goruntulerini takip et |
@@ -836,14 +836,14 @@ API maliyetlerini azaltmak icin yanitlar `CacheDurationMinutes` (varsayilan: 30 
 |-----------|------------|----------|
 | `Mode` | Paper | Paper (simule) veya Live (gercek para) |
 | `InitialBalance` | $50 | Baslangic kagit bakiyesi |
-| `ScanIntervalMinutes` | 5 | Piyasa tarama sikligi (dakika) |
-| `MaxOpenPositions` | 10 | Maks es zamanli acik pozisyon |
+| `ScanIntervalMinutes` | 2 | Piyasa tarama sikligi (dakika) |
+| `MaxOpenPositions` | 20 | Maks es zamanli acik pozisyon |
 | `MaxPositionSizePercent` | %5 | Kelly siniri — islem basina maks bakiye yuzdesi |
 | `MinEdgeThreshold` | 0.06 | Gereken minimum edge (%6) |
-| `MinVolumeUsd` | $5,000 | Minimum 24s hacim filtresi |
+| `MinVolumeUsd` | $50,000 | Minimum 24s hacim filtresi |
 | `MaxSpreadCents` | 5 | Maks alim-satim farki (sent) |
-| `StopLossPercent` | %30 | Zarar bunu asarsa kapat |
-| `TakeProfitPercent` | %50 | Kar bunu asarsa kapat |
+| `StopLossPercent` | %15 | Zarar bunu asarsa kapat |
+| `TakeProfitPercent` | %25 | Kar bunu asarsa kapat |
 | `SurvivalModeThresholdUsd` | $10 | Bu bakiyenin altinda aktiviteyi azalt |
 
 ---
@@ -852,14 +852,14 @@ API maliyetlerini azaltmak icin yanitlar `CacheDurationMinutes` (varsayilan: 30 
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    PIYASA TARAMA (Her 5 dk)                     │
+│                    PIYASA TARAMA (Her 2 dk)                     │
 │                                                                 │
 │  Polymarket API → 500+ piyasa                                   │
 │       │                                                         │
 │       ▼                                                         │
 │  ┌─────────────────────────────────────────┐                    │
 │  │        KURAL TABANLI ON-FILTRE          │                    │
-│  │  • Hacim >= $5,000                      │                    │
+│  │  • Hacim >= $50,000                     │                    │
 │  │  • Spread <= 5¢                         │                    │
 │  │  • Fiyat < 15¢ VEYA Fiyat > 85¢         │                    │
 │  │  • Edge >= %6                           │                    │

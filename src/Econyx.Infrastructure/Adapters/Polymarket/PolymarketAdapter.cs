@@ -38,6 +38,7 @@ internal sealed partial class PolymarketAdapter : IPlatformAdapter
         {
             var result = await _client.GammaApi.GetEventsAsync(
                 closed: false, active: true, volumeMin: _minVolumeUsd,
+                orderBy: ["volume24hr"], ascending: false,
                 limit: pageSize, offset: offset, ct: ct);
 
             if (!result.Success)

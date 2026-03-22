@@ -87,9 +87,25 @@ public sealed class PositionMonitorService : BackgroundService
         CancellationToken ct)
     {
         var currentProbability = await platform.GetPriceAsync(position.TokenId, ct);
+        var holdDuration = DateTime.UtcNow - position.CreatedAt;
+
+        if (holdDuration.TotalHours >= _tradingOptions.MaxHoldHours)
+        {
+            var exitPrice = currentProbability is not null
+                ? Money.Create(currentProbability.Value)
+                : position.CurrentPrice;
+
+            _logger.LogInformation(
+                "Max hold time reached — position: {Market}, held: {Hours:F1}h, closing at {Price}",
+                position.MarketQuestion, holdDuration.TotalHours, exitPrice.Amount);
+
+            await mediator.Send(new ClosePositionCommand(position.Id, exitPrice), ct);
+            return;
+        }
+
         if (currentProbability is null)
         {
-            _logger.LogWarning("Price unavailable for {TokenId}, skipping position {Id}", position.TokenId, position.Id);
+            _logger.LogWarning("Price unavailable for {TokenId}, skipping SL/TP check", position.TokenId);
             return;
         }
 
@@ -102,18 +118,9 @@ public sealed class PositionMonitorService : BackgroundService
         if (entryAmount <= 0)
             return;
 
-        var holdDuration = DateTime.UtcNow - position.CreatedAt;
         var pnlPercent = (pnl.Amount / entryAmount) * 100m;
 
-        if (holdDuration.TotalHours >= _tradingOptions.MaxHoldHours)
-        {
-            _logger.LogInformation(
-                "Max hold time reached — position: {Market}, PnL: {PnL}%, held: {Hours:F1}h",
-                position.MarketQuestion, pnlPercent.ToString("F2"), holdDuration.TotalHours);
-
-            await mediator.Send(new ClosePositionCommand(position.Id, currentPrice), ct);
-        }
-        else if (pnlPercent <= -_tradingOptions.StopLossPercent)
+        if (pnlPercent <= -_tradingOptions.StopLossPercent)
         {
             _logger.LogWarning(
                 "Stop-loss triggered — position: {Market}, PnL: {PnL}%",
