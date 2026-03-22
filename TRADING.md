@@ -823,7 +823,7 @@ API maliyetlerini azaltmak icin yanitlar `CacheDurationMinutes` (varsayilan: 30 
 
 | Servis | Aralik | Amac |
 |--------|--------|------|
-| `MarketScannerService` | 2 dk | Piyasalari tara, sinyal uret, emir ver |
+| `MarketScannerService` | 1 dk | Piyasalari tara, sinyal uret, emir ver |
 | `TradeExecutorService` | 30 sn | Live bekleyen emirlerin dolum durumunu kontrol et |
 | `PositionMonitorService` | 60 sn | Acik pozisyonlari izle, SL/TP tetikle |
 | `BalanceTrackerService` | periyodik | Zaman icinde bakiye goruntulerini takip et |
@@ -837,14 +837,15 @@ API maliyetlerini azaltmak icin yanitlar `CacheDurationMinutes` (varsayilan: 30 
 |-----------|------------|----------|
 | `Mode` | Paper | Paper (simule) veya Live (gercek para) |
 | `InitialBalance` | $50 | Baslangic kagit bakiyesi |
-| `ScanIntervalMinutes` | 2 | Piyasa tarama sikligi (dakika) |
+| `ScanIntervalMinutes` | 1 | Piyasa tarama sikligi (dakika) |
 | `MaxOpenPositions` | 20 | Maks es zamanli acik pozisyon |
 | `MaxPositionSizePercent` | %5 | Kelly siniri — islem basina maks bakiye yuzdesi |
 | `MinEdgeThreshold` | 0.06 | Gereken minimum edge (%6) |
 | `MinVolumeUsd` | $50,000 | Minimum 24s hacim filtresi |
 | `MaxSpreadCents` | 5 | Maks alim-satim farki (sent) |
-| `StopLossPercent` | %15 | Zarar bunu asarsa kapat |
-| `TakeProfitPercent` | %25 | Kar bunu asarsa kapat |
+| `StopLossPercent` | %10 | Zarar bunu asarsa kapat |
+| `TakeProfitPercent` | %15 | Kar bunu asarsa kapat |
+| `MaxHoldMinutes` | 15 | Pozisyon tutma suresi limiti (dakika) |
 | `SurvivalModeThresholdUsd` | $10 | Bu bakiyenin altinda aktiviteyi azalt |
 
 ---
@@ -853,7 +854,7 @@ API maliyetlerini azaltmak icin yanitlar `CacheDurationMinutes` (varsayilan: 30 
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    PIYASA TARAMA (Her 2 dk)                     │
+│                    PIYASA TARAMA (Her 1 dk)                     │
 │                                                                 │
 │  Polymarket API → 500+ piyasa                                   │
 │       │                                                         │
@@ -904,8 +905,8 @@ API maliyetlerini azaltmak icin yanitlar `CacheDurationMinutes` (varsayilan: 30 
 │       ▼                                                         │
 │  PnL% hesapla                                                   │
 │       │                                                         │
-│       ├── PnL% <= -%15 → ZARAR DURDUR → Pozisyonu kapat         │
-│       ├── PnL% >= +%25 → KAR AL → Pozisyonu kapat               │
+│       ├── PnL% <= -%10 → ZARAR DURDUR → Pozisyonu kapat         │
+│       ├── PnL% >= +%15 → KAR AL → Pozisyonu kapat               │
 │       └── Aksi halde → Izlemeye devam                           │
 │                                                                 │
 │  Kapatmada: Gerceklesen kar/zarar ile Trade kaydi olusturulur   │
@@ -943,4 +944,4 @@ API maliyetlerini azaltmak icin yanitlar `CacheDurationMinutes` (varsayilan: 30 
 3. Firlatma erteleme duyurusu nedeniyle **fiyat $0.09'a dusuyor**
 4. **PnL:** (0.09 - 0.12) * 416.67 = -$12.50
 5. **PnL%:** (-$12.50 / $50) * 100 = -%25
-6. Fiyat ~$0.102'ye ulastiginda **zarar durdur (-%15) tetiklendi**
+6. Fiyat ~$0.108'e ulastiginda **zarar durdur (-%10) tetiklendi**

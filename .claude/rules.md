@@ -102,8 +102,10 @@
 
 ### Volatilite Tabanli Piyasa Secimi
 - Piyasalar yuksek 24 saatlik hacme sahip olmali (MinVolumeUsd: $50,000)
-- Sonuclanma tarihi 30 gun icinde olan piyasalar onceliklendirilir
-- Bu iki kosul, likidite ve zaman baskisi olan piyasalarda daha iyi edge firsatlari saglar
+- Kisa vadeli kripto "Up or Down" piyasalari (BTC, ETH, SOL) onceliklidir — 1 saat icinde sonuclanir, yuksek hacme ve sik fiyat degisimlerine sahiptir
+- Uzun vadeli politik piyasalar dusuk onceliklidir
+- Maksimum pozisyon tutma suresi 15 dakikadir (MaxHoldMinutes: 15)
+- Bu kosullar, likidite ve zaman baskisi olan piyasalarda daha iyi edge firsatlari saglar
 
 ### StrategySignal
 - `MarketId`, `TokenId`, `RecommendedSide` (Yes/No), `Edge`, `FairValue`, `MarketPrice`, `Confidence`, `StrategyName`, `Reasoning`
