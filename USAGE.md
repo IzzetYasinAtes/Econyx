@@ -16,7 +16,7 @@ Polymarket is a decentralized prediction market platform built on the Polygon bl
 
 Econyx is an autonomous trading bot that continuously scans Polymarket for mispriced contracts. Here's the complete flow:
 
-### 1. Market Scanning (Every 5 Minutes)
+### 1. Market Scanning (Every 2 Minutes)
 
 The bot fetches all open markets from Polymarket's API (~500+ markets at any time). It checks each market's volume, spread, and status.
 
@@ -24,7 +24,7 @@ The bot fetches all open markets from Polymarket's API (~500+ markets at any tim
 
 Before spending money on AI calls, a rule-based filter eliminates markets that don't meet basic criteria:
 
-- Minimum trading volume ($5,000 default)
+- Minimum trading volume ($50,000 default)
 - Maximum bid-ask spread (5 cents default)
 - Price anomalies: shares priced below $0.15 (potential undervalued) or above $0.85 (potential overvalued)
 
@@ -59,7 +59,7 @@ This mathematically optimal formula bets more when the edge is larger and less w
 
 - **Stop-Loss**: Automatically closes a position if the loss exceeds 15% (configurable)
 - **Take-Profit**: Automatically closes when profit exceeds 25% (configurable)
-- **Max Positions**: Limits total open positions to 10 (configurable)
+- **Max Positions**: Limits total open positions to 20 (configurable)
 - **Survival Mode**: Reduces activity when balance drops below a critical threshold
 
 ## Prerequisites
@@ -185,14 +185,14 @@ When you're comfortable with the paper trading results:
 |-----------|---------|-------------|
 | `Trading:Mode` | Paper | Paper (simulated) or Live (real money) |
 | `Trading:InitialBalance` | 50 | Starting paper balance in USD |
-| `Trading:ScanIntervalMinutes` | 5 | How often to scan markets |
-| `Trading:MaxOpenPositions` | 10 | Maximum simultaneous open positions |
+| `Trading:ScanIntervalMinutes` | 2 | How often to scan markets |
+| `Trading:MaxOpenPositions` | 20 | Maximum simultaneous open positions |
 | `Trading:MaxPositionSizePercent` | 2 | Max % of balance per position |
 | `Trading:MinEdgeThreshold` | 0.06 | Minimum edge to enter a trade (6%) |
-| `Trading:MinVolumeUsd` | 5000 | Minimum market volume filter |
+| `Trading:MinVolumeUsd` | 50000 | Minimum market volume filter |
 | `Trading:MaxSpreadCents` | 5 | Maximum bid-ask spread in cents |
-| `Trading:StopLossPercent` | 30 | Close position if loss exceeds this % |
-| `Trading:TakeProfitPercent` | 50 | Close position if profit exceeds this % |
+| `Trading:StopLossPercent` | 15 | Close position if loss exceeds this % |
+| `Trading:TakeProfitPercent` | 25 | Close position if profit exceeds this % |
 | `Trading:SurvivalModeThresholdUsd` | 10 | Reduce activity below this balance |
 
 ## Tips for Better Results
@@ -242,7 +242,7 @@ Polymarket, Polygon blockchain uzerinde kurulu merkeziyetsiz bir tahmin piyasasi
 
 Econyx, Polymarket'te yanlis fiyatlanmis kontratlari surekli tarayan otonom bir trading botudur. Tam akis:
 
-### 1. Piyasa Tarama (Her 5 Dakikada)
+### 1. Piyasa Tarama (Her 2 Dakikada)
 
 Bot, Polymarket API'sinden tum acik piyasalari ceker (herhangi bir anda ~500+ piyasa). Her piyasanin hacmini, spreadini ve durumunu kontrol eder.
 
@@ -250,7 +250,7 @@ Bot, Polymarket API'sinden tum acik piyasalari ceker (herhangi bir anda ~500+ pi
 
 AI cagrilarina para harcamadan once, kural tabanli filtre temel kriterleri karsilamayan piyasalari eler:
 
-- Minimum islem hacmi ($5,000 varsayilan)
+- Minimum islem hacmi ($50,000 varsayilan)
 - Maksimum alim-satim farki (5 sent varsayilan)
 - Fiyat anomalileri: $0.15 altinda fiyatlanmis (potansiyel olarak degerinin altinda) veya $0.85 uzerinde (potansiyel olarak asiri degerli)
 
@@ -285,7 +285,7 @@ Bu matematiksel olarak optimal formul, edge buyuk oldugunda daha fazla, kucuk ol
 
 - **Zarar Durdur (Stop-Loss)**: Zarar %15'i asarsa pozisyonu otomatik kapatir (ayarlanabilir)
 - **Kar Al (Take-Profit)**: Kar %25'i asarsa otomatik kapatir (ayarlanabilir)
-- **Maks Pozisyon**: Toplam acik pozisyonlari 10 ile sinirlar (ayarlanabilir)
+- **Maks Pozisyon**: Toplam acik pozisyonlari 20 ile sinirlar (ayarlanabilir)
 - **Hayatta Kalma Modu**: Bakiye kritik esik degerinin altina duserse aktiviteyi azaltir
 
 ## Gereksinimler
@@ -411,14 +411,14 @@ Kagit islem sonuclari sizi tatmin ettiginde:
 |-----------|------------|----------|
 | `Trading:Mode` | Paper | Paper (simule) veya Live (gercek para) |
 | `Trading:InitialBalance` | 50 | Baslangic kagit bakiyesi (USD) |
-| `Trading:ScanIntervalMinutes` | 5 | Piyasa tarama sikligi (dakika) |
-| `Trading:MaxOpenPositions` | 10 | Maksimum es zamanli acik pozisyon |
+| `Trading:ScanIntervalMinutes` | 2 | Piyasa tarama sikligi (dakika) |
+| `Trading:MaxOpenPositions` | 20 | Maksimum es zamanli acik pozisyon |
 | `Trading:MaxPositionSizePercent` | 2 | Pozisyon basina maks bakiye yuzdesi |
 | `Trading:MinEdgeThreshold` | 0.06 | Islem acmak icin min edge (%6) |
-| `Trading:MinVolumeUsd` | 5000 | Minimum piyasa hacmi filtresi |
+| `Trading:MinVolumeUsd` | 50000 | Minimum piyasa hacmi filtresi |
 | `Trading:MaxSpreadCents` | 5 | Maksimum alim-satim farki (sent) |
-| `Trading:StopLossPercent` | 30 | Zarar bu yuzedeyi asarsa pozisyonu kapat |
-| `Trading:TakeProfitPercent` | 50 | Kar bu yuzedeyi asarsa pozisyonu kapat |
+| `Trading:StopLossPercent` | 15 | Zarar bu yuzedeyi asarsa pozisyonu kapat |
+| `Trading:TakeProfitPercent` | 25 | Kar bu yuzedeyi asarsa pozisyonu kapat |
 | `Trading:SurvivalModeThresholdUsd` | 10 | Bu bakiyenin altinda aktiviteyi azalt |
 
 ## Daha Iyi Sonuclar Icin Ipuclari

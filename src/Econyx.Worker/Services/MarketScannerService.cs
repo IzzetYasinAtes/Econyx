@@ -50,6 +50,17 @@ public sealed class MarketScannerService : BackgroundService
             {
                 await using var scope = _scopeFactory.CreateAsyncScope();
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                var positionRepo = scope.ServiceProvider.GetRequiredService<IPositionRepository>();
+
+                var openPositions = await positionRepo.GetOpenPositionsAsync(stoppingToken);
+                if (openPositions.Count >= _tradingOptions.MaxOpenPositions)
+                {
+                    _logger.LogDebug("All position slots full ({Count}/{Max}), skipping scan",
+                        openPositions.Count, _tradingOptions.MaxOpenPositions);
+                    sw.Stop();
+                    await Task.Delay(interval, stoppingToken);
+                    continue;
+                }
 
                 var result = await mediator.Send(new ScanMarketsCommand(), stoppingToken);
 

@@ -95,3 +95,4 @@ public sealed class {Name}StrategyTests
 - `TradingOptions` ile esik degerleri konfigurasyondan gelir
 - Confidence [0.0, 1.0] araliginda olmali
 - `StrategySignal.Reasoning` alaninda sinyal sebebi aciklanir
+- **Hacim ve sonuclanma tarihi kontrolu:** Strateji olusturulurken piyasanin 24s hacminin MinVolumeUsd ($50,000) uzerinde oldugu ve sonuclanma tarihinin 30 gun icinde oldugu dogrulanmali. Bu, likidite ve zaman baskisi olan piyasalarda daha guvenilir sinyaller saglar.

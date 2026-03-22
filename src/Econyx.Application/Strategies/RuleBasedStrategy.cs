@@ -27,7 +27,8 @@ public sealed class RuleBasedStrategy : IStrategy
             m.Status == MarketStatus.Open &&
             m.VolumeUsd >= _options.MinVolumeUsd &&
             m.Spread <= _options.MaxSpreadCents / 100m &&
-            m.Outcomes.Count == 2);
+            m.Outcomes.Count == 2 &&
+            (m.ResolutionDate == null || m.ResolutionDate <= DateTime.UtcNow.AddDays(30)));
 
         foreach (var market in eligible)
         {

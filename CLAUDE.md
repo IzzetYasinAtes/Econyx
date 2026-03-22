@@ -81,7 +81,7 @@ dotnet ef migrations add <MigrationName> --project src/Econyx.Infrastructure --s
 ## Trading Akisi
 
 ```
-Her 5 Dakika:
+Her 2 Dakika:
 1. MarketScannerService → ScanMarketsCommand tetikler
 2. IPlatformAdapter.GetMarketsAsync() → ~500+ acik piyasa
 3. RuleBasedStrategy.Filter() → ~20-50 aday (on-filtre, ucretsiz)
@@ -92,6 +92,8 @@ Her 5 Dakika:
 8. PositionMonitorService → SL/TP kontrolu (her 60 sn)
 9. SignalR → Dashboard guncelleme
 ```
+
+> **Not:** Piyasa secimi volatilite tabanlidir — yuksek 24s hacimli ve sonuclanma tarihi 30 gun icinde olan piyasalar onceliklendirilir.
 
 ## Domain Modeli
 

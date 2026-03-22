@@ -100,6 +100,11 @@
 4. `DependencyInjection.cs`'de DI'a kaydet
 5. `HybridStrategy`'de entegre et (gerekiyorsa)
 
+### Volatilite Tabanli Piyasa Secimi
+- Piyasalar yuksek 24 saatlik hacme sahip olmali (MinVolumeUsd: $50,000)
+- Sonuclanma tarihi 30 gun icinde olan piyasalar onceliklendirilir
+- Bu iki kosul, likidite ve zaman baskisi olan piyasalarda daha iyi edge firsatlari saglar
+
 ### StrategySignal
 - `MarketId`, `TokenId`, `RecommendedSide` (Yes/No), `Edge`, `FairValue`, `MarketPrice`, `Confidence`, `StrategyName`, `Reasoning`
 
