@@ -34,14 +34,21 @@ public sealed class RuleBasedStrategy : IStrategy
         {
             ct.ThrowIfCancellationRequested();
 
+            var isShortTerm = market.ResolutionDate.HasValue &&
+                              market.ResolutionDate.Value <= DateTime.UtcNow.AddHours(2);
+
+            var lowMin = isShortTerm ? 0.10m : 0.15m;
+            var lowMax = isShortTerm ? 0.48m : 0.45m;
+            var highMin = isShortTerm ? 0.52m : 0.55m;
+            var highMax = isShortTerm ? 0.90m : 0.85m;
+
             StrategySignal? bestSignal = null;
 
             foreach (var outcome in market.Outcomes)
             {
                 var price = outcome.Price.Value;
 
-
-                if (price >= 0.15m && price <= 0.45m)
+                if (price >= lowMin && price <= lowMax)
                 {
                     var edge = 0.50m - price;
 
@@ -64,7 +71,7 @@ public sealed class RuleBasedStrategy : IStrategy
                     }
                 }
 
-                else if (price >= 0.55m && price <= 0.85m)
+                else if (price >= highMin && price <= highMax)
                 {
                     var complementary = market.Outcomes.FirstOrDefault(o =>
                         o.Token.Value != outcome.Token.Value);
@@ -75,7 +82,7 @@ public sealed class RuleBasedStrategy : IStrategy
                     var compPrice = complementary.Price.Value;
 
 
-                    if (compPrice < 0.15m || compPrice > 0.45m)
+                    if (compPrice < lowMin || compPrice > lowMax)
                         continue;
 
                     var edge = 0.50m - compPrice;

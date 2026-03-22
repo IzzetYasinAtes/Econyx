@@ -89,7 +89,7 @@ public sealed class PositionMonitorService : BackgroundService
         var currentProbability = await platform.GetPriceAsync(position.TokenId, ct);
         var holdDuration = DateTime.UtcNow - position.CreatedAt;
 
-        if (holdDuration.TotalHours >= _tradingOptions.MaxHoldHours)
+        if (holdDuration.TotalMinutes >= _tradingOptions.MaxHoldMinutes)
         {
             var exitPrice = currentProbability is not null
                 ? Money.Create(currentProbability.Value)

@@ -18,6 +18,13 @@ public sealed class PlaceOrderHandlerTests
     private readonly Mock<IPositionRepository> _positionRepoMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
+    public PlaceOrderHandlerTests()
+    {
+        _positionRepoMock
+            .Setup(x => x.FindAsync(It.IsAny<System.Linq.Expressions.Expression<Func<Position, bool>>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Position>());
+    }
+
     private PlaceOrderHandler CreateHandler() => new(
         _platformMock.Object,
         _orderRepoMock.Object,

@@ -31,6 +31,15 @@ public sealed class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Resul
     public async Task<Result<Guid>> Handle(PlaceOrderCommand request, CancellationToken cancellationToken)
     {
         var signal = request.Signal;
+
+        var existingPositions = await _positionRepository.FindAsync(
+            p => p.IsOpen && p.MarketId == signal.MarketId, cancellationToken);
+        if (existingPositions.Count > 0)
+        {
+            return Result.Failure<Guid>(
+                Error.Conflict($"Position already open for market: {signal.MarketQuestion}"));
+        }
+
         if (signal.MarketPrice.Value <= 0)
         {
             return Result.Failure<Guid>(

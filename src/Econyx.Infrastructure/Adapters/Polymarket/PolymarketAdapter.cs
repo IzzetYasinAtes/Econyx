@@ -30,37 +30,40 @@ internal sealed partial class PolymarketAdapter : IPlatformAdapter
 
     public async Task<IReadOnlyList<Market>> GetMarketsAsync(CancellationToken ct = default)
     {
-        const int pageSize = 500;
         var markets = new List<Market>();
-        var offset = 0;
 
-        while (!ct.IsCancellationRequested)
+        var cryptoResult = await _client.GammaApi.GetEventsAsync(
+            closed: false, active: true, tagSlug: "crypto",
+            endTimeMax: DateTime.UtcNow.AddHours(1),
+            orderBy: ["volume24hr"], ascending: false,
+            limit: 100, ct: ct);
+
+        if (cryptoResult.Success && cryptoResult.Data is not null)
         {
-            var result = await _client.GammaApi.GetEventsAsync(
-                closed: false, active: true, volumeMin: _minVolumeUsd,
-                orderBy: ["volume24hr"], ascending: false,
-                limit: pageSize, offset: offset, ct: ct);
-
-            if (!result.Success)
-            {
-                LogGetEventsFailed(_logger, result.Error?.ToString());
-                break;
-            }
-
-            if (result.Data is null || result.Data.Length == 0)
-                break;
-
-            foreach (var evt in result.Data)
+            foreach (var evt in cryptoResult.Data)
             {
                 var mapped = PolymarketMapper.ToDomainMarket(evt);
                 if (mapped is not null)
                     markets.Add(mapped);
             }
+            LogMarketsFetched(_logger, markets.Count);
+            LogCryptoMarkets(_logger, markets.Count);
+        }
 
-            if (result.Data.Length < pageSize)
-                break;
+        var generalResult = await _client.GammaApi.GetEventsAsync(
+            closed: false, active: true, volumeMin: _minVolumeUsd,
+            orderBy: ["volume24hr"], ascending: false,
+            limit: 200, ct: ct);
 
-            offset += pageSize;
+        if (generalResult.Success && generalResult.Data is not null)
+        {
+            var existingIds = markets.Select(m => m.ExternalId).ToHashSet();
+            foreach (var evt in generalResult.Data)
+            {
+                var mapped = PolymarketMapper.ToDomainMarket(evt);
+                if (mapped is not null && !existingIds.Contains(mapped.ExternalId))
+                    markets.Add(mapped);
+            }
         }
 
         LogMarketsFetched(_logger, markets.Count);
@@ -124,6 +127,9 @@ internal sealed partial class PolymarketAdapter : IPlatformAdapter
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Fetched {Count} markets from Polymarket")]
     private static partial void LogMarketsFetched(ILogger logger, int count);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Found {Count} short-term crypto markets")]
+    private static partial void LogCryptoMarkets(ILogger logger, int count);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Polymarket GetOrderBookAsync failed for {TokenId}: {Error}")]
     private static partial void LogOrderBookFailed(ILogger logger, string tokenId, string? error);

@@ -81,7 +81,7 @@ dotnet ef migrations add <MigrationName> --project src/Econyx.Infrastructure --s
 ## Trading Akisi
 
 ```
-Her 2 Dakika:
+Her 1 Dakika:
 1. MarketScannerService → ScanMarketsCommand tetikler
 2. IPlatformAdapter.GetMarketsAsync() → ~500+ acik piyasa
 3. RuleBasedStrategy.Filter() → ~20-50 aday (on-filtre, ucretsiz)
@@ -93,7 +93,7 @@ Her 2 Dakika:
 9. SignalR → Dashboard guncelleme
 ```
 
-> **Not:** Piyasa secimi volatilite tabanlidir — yuksek 24s hacimli ve sonuclanma tarihi 30 gun icinde olan piyasalar onceliklendirilir.
+> **Not:** Piyasa secimi volatilite tabanlidir — yuksek 24s hacimli ve sonuclanma tarihi 30 gun icinde olan piyasalar onceliklendirilir. Kisa vadeli kripto "Up or Down" piyasalari (BTC, ETH, SOL) onceliklidir; bu piyasalar 1 saat icinde sonuclanir, yuksek hacme ve sik fiyat degisimlerine sahiptir. Uzun vadeli politik piyasalar dusuk onceliklidir.
 
 ## Domain Modeli
 

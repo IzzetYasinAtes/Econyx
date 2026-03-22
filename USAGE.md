@@ -16,7 +16,7 @@ Polymarket is a decentralized prediction market platform built on the Polygon bl
 
 Econyx is an autonomous trading bot that continuously scans Polymarket for mispriced contracts. Here's the complete flow:
 
-### 1. Market Scanning (Every 2 Minutes)
+### 1. Market Scanning (Every 1 Minute)
 
 The bot fetches all open markets from Polymarket's API (~500+ markets at any time). It checks each market's volume, spread, and status.
 
@@ -57,8 +57,8 @@ This mathematically optimal formula bets more when the edge is larger and less w
 
 ### 6. Risk Management
 
-- **Stop-Loss**: Automatically closes a position if the loss exceeds 15% (configurable)
-- **Take-Profit**: Automatically closes when profit exceeds 25% (configurable)
+- **Stop-Loss**: Automatically closes a position if the loss exceeds 10% (configurable)
+- **Take-Profit**: Automatically closes when profit exceeds 15% (configurable)
 - **Max Positions**: Limits total open positions to 20 (configurable)
 - **Survival Mode**: Reduces activity when balance drops below a critical threshold
 
@@ -185,14 +185,15 @@ When you're comfortable with the paper trading results:
 |-----------|---------|-------------|
 | `Trading:Mode` | Paper | Paper (simulated) or Live (real money) |
 | `Trading:InitialBalance` | 50 | Starting paper balance in USD |
-| `Trading:ScanIntervalMinutes` | 2 | How often to scan markets |
+| `Trading:ScanIntervalMinutes` | 1 | How often to scan markets |
 | `Trading:MaxOpenPositions` | 20 | Maximum simultaneous open positions |
 | `Trading:MaxPositionSizePercent` | 2 | Max % of balance per position |
 | `Trading:MinEdgeThreshold` | 0.06 | Minimum edge to enter a trade (6%) |
 | `Trading:MinVolumeUsd` | 50000 | Minimum market volume filter |
 | `Trading:MaxSpreadCents` | 5 | Maximum bid-ask spread in cents |
-| `Trading:StopLossPercent` | 15 | Close position if loss exceeds this % |
-| `Trading:TakeProfitPercent` | 25 | Close position if profit exceeds this % |
+| `Trading:StopLossPercent` | 10 | Close position if loss exceeds this % |
+| `Trading:TakeProfitPercent` | 15 | Close position if profit exceeds this % |
+| `Trading:MaxHoldMinutes` | 15 | Maximum time to hold a position (minutes) |
 | `Trading:SurvivalModeThresholdUsd` | 10 | Reduce activity below this balance |
 
 ## Tips for Better Results
@@ -242,7 +243,7 @@ Polymarket, Polygon blockchain uzerinde kurulu merkeziyetsiz bir tahmin piyasasi
 
 Econyx, Polymarket'te yanlis fiyatlanmis kontratlari surekli tarayan otonom bir trading botudur. Tam akis:
 
-### 1. Piyasa Tarama (Her 2 Dakikada)
+### 1. Piyasa Tarama (Her 1 Dakikada)
 
 Bot, Polymarket API'sinden tum acik piyasalari ceker (herhangi bir anda ~500+ piyasa). Her piyasanin hacmini, spreadini ve durumunu kontrol eder.
 
@@ -283,8 +284,8 @@ Bu matematiksel olarak optimal formul, edge buyuk oldugunda daha fazla, kucuk ol
 
 ### 6. Risk Yonetimi
 
-- **Zarar Durdur (Stop-Loss)**: Zarar %15'i asarsa pozisyonu otomatik kapatir (ayarlanabilir)
-- **Kar Al (Take-Profit)**: Kar %25'i asarsa otomatik kapatir (ayarlanabilir)
+- **Zarar Durdur (Stop-Loss)**: Zarar %10'u asarsa pozisyonu otomatik kapatir (ayarlanabilir)
+- **Kar Al (Take-Profit)**: Kar %15'i asarsa otomatik kapatir (ayarlanabilir)
 - **Maks Pozisyon**: Toplam acik pozisyonlari 20 ile sinirlar (ayarlanabilir)
 - **Hayatta Kalma Modu**: Bakiye kritik esik degerinin altina duserse aktiviteyi azaltir
 
@@ -411,14 +412,15 @@ Kagit islem sonuclari sizi tatmin ettiginde:
 |-----------|------------|----------|
 | `Trading:Mode` | Paper | Paper (simule) veya Live (gercek para) |
 | `Trading:InitialBalance` | 50 | Baslangic kagit bakiyesi (USD) |
-| `Trading:ScanIntervalMinutes` | 2 | Piyasa tarama sikligi (dakika) |
+| `Trading:ScanIntervalMinutes` | 1 | Piyasa tarama sikligi (dakika) |
 | `Trading:MaxOpenPositions` | 20 | Maksimum es zamanli acik pozisyon |
 | `Trading:MaxPositionSizePercent` | 2 | Pozisyon basina maks bakiye yuzdesi |
 | `Trading:MinEdgeThreshold` | 0.06 | Islem acmak icin min edge (%6) |
 | `Trading:MinVolumeUsd` | 50000 | Minimum piyasa hacmi filtresi |
 | `Trading:MaxSpreadCents` | 5 | Maksimum alim-satim farki (sent) |
-| `Trading:StopLossPercent` | 15 | Zarar bu yuzedeyi asarsa pozisyonu kapat |
-| `Trading:TakeProfitPercent` | 25 | Kar bu yuzedeyi asarsa pozisyonu kapat |
+| `Trading:StopLossPercent` | 10 | Zarar bu yuzedeyi asarsa pozisyonu kapat |
+| `Trading:TakeProfitPercent` | 15 | Kar bu yuzedeyi asarsa pozisyonu kapat |
+| `Trading:MaxHoldMinutes` | 15 | Pozisyon tutma suresi limiti (dakika) |
 | `Trading:SurvivalModeThresholdUsd` | 10 | Bu bakiyenin altinda aktiviteyi azalt |
 
 ## Daha Iyi Sonuclar Icin Ipuclari

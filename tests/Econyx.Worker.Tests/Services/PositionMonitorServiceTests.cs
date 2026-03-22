@@ -26,7 +26,7 @@ public sealed class PositionMonitorServiceTests
     {
         StopLossPercent = 50m,
         TakeProfitPercent = 100m,
-        MaxHoldHours = 24
+        MaxHoldMinutes = 1440
     };
 
     private PositionMonitorService CreateService()
