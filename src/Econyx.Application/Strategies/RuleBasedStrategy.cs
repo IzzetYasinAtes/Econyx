@@ -40,7 +40,7 @@ public sealed class RuleBasedStrategy : IStrategy
                 var price = outcome.Price.Value;
 
 
-                if (price >= 0.20m && price <= 0.45m)
+                if (price >= 0.15m && price <= 0.45m)
                 {
                     var edge = 0.50m - price;
 
@@ -63,7 +63,7 @@ public sealed class RuleBasedStrategy : IStrategy
                     }
                 }
 
-                else if (price >= 0.55m && price <= 0.80m)
+                else if (price >= 0.55m && price <= 0.85m)
                 {
                     var complementary = market.Outcomes.FirstOrDefault(o =>
                         o.Token.Value != outcome.Token.Value);
@@ -74,7 +74,7 @@ public sealed class RuleBasedStrategy : IStrategy
                     var compPrice = complementary.Price.Value;
 
 
-                    if (compPrice < 0.20m || compPrice > 0.45m)
+                    if (compPrice < 0.15m || compPrice > 0.45m)
                         continue;
 
                     var edge = 0.50m - compPrice;

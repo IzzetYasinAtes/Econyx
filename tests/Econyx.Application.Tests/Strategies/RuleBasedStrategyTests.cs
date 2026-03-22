@@ -127,7 +127,7 @@ public sealed class RuleBasedStrategyTests
     [Fact]
     public async Task EvaluateAsync_ShouldSkipSignals_WhenPriceOutsideTargetZone()
     {
-        // Price at 0.08 is outside target zone (0.20-0.45), should be skipped
+        // Price at 0.08 is outside target zone (0.15-0.45), should be skipped
         var market = CreateMarket(yesPrice: 0.08m);
         var strategy = CreateStrategy();
 
