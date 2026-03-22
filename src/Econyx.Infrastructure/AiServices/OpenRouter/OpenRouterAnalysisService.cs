@@ -50,10 +50,6 @@ internal sealed partial class OpenRouterAnalysisService : IAiAnalysisService
         if (_cache.TryGet<FairValueResult>(cacheKey, out var cached) && cached is not null)
         {
             LogCacheHit(_logger, request.Question);
-            await _requestLogger.LogAsync(
-                "OpenRouter", _modelId, request.Question, "", null,
-                cached.Reasoning, cached.Outcomes.Count > 0 ? cached.Outcomes[0].FairValue.Value : null, cached.Confidence,
-                0, 0, 0m, true, true, null, ct);
             return cached;
         }
 
