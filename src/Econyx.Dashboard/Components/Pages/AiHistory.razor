@@ -1,0 +1,147 @@
+@page "/ai-history"
+@using Econyx.Application.Queries.GetAiLogs
+@inject IMediator Mediator
+@inject IStringLocalizer<SharedResource> L
+
+<PageTitle>AI History</PageTitle>
+
+<div class="page-header">
+    <h2 class="page-title mono">AI HISTORY</h2>
+    <span class="text-muted mono" style="font-size: 0.75rem;">
+        @if (_result is not null)
+        {
+            <text>@_result.TotalCount logs | Total: $@_result.TotalCost.ToString("F4")</text>
+        }
+    </span>
+</div>
+
+@if (_result is null)
+{
+    <div class="loading mono text-muted">@L["Loading"]</div>
+}
+else if (_result.Items.Count == 0)
+{
+    <div class="empty-state mono text-muted">No AI logs yet.</div>
+}
+else
+{
+    <div class="ai-history-layout">
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Market</th>
+                        <th>Model</th>
+                        <th>Fair Value</th>
+                        <th>Conf.</th>
+                        <th>Tokens</th>
+                        <th>Cost</th>
+                        <th>Cache</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in _result.Items)
+                    {
+                        <tr class="log-row @(_expandedId == log.Id ? "expanded" : "")"
+                            @onclick="() => ToggleExpand(log.Id)">
+                            <td class="mono text-muted">@log.CreatedAt.ToLocalTime().ToString("MM/dd HH:mm")</td>
+                            <td class="col-question" title="@log.MarketQuestion">@Truncate(log.MarketQuestion, 40)</td>
+                            <td class="mono text-muted">@TruncateModel(log.ModelId)</td>
+                            <td class="mono">@(log.FairValue?.ToString("F2") ?? "-")</td>
+                            <td class="mono">@(log.Confidence?.ToString("F2") ?? "-")</td>
+                            <td class="mono text-muted">@log.InputTokens/@log.OutputTokens</td>
+                            <td class="mono">$@log.CostUsd.ToString("F4")</td>
+                            <td>
+                                @if (log.IsCacheHit)
+                                {
+                                    <span class="badge cache-hit">HIT</span>
+                                }
+                            </td>
+                            <td>
+                                @if (log.IsSuccess)
+                                {
+                                    <span class="badge status-ok">OK</span>
+                                }
+                                else
+                                {
+                                    <span class="badge status-err">ERR</span>
+                                }
+                            </td>
+                        </tr>
+                        @if (_expandedId == log.Id)
+                        {
+                            <tr class="detail-row">
+                                <td colspan="9">
+                                    <div class="detail-content">
+                                        @if (!string.IsNullOrEmpty(log.ParsedReasoning))
+                                        {
+                                            <div class="detail-section">
+                                                <span class="detail-label">Reasoning:</span>
+                                                <span>@log.ParsedReasoning</span>
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(log.Response))
+                                        {
+                                            <div class="detail-section">
+                                                <span class="detail-label">Response:</span>
+                                                <pre class="response-json">@log.Response</pre>
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(log.ErrorMessage))
+                                        {
+                                            <div class="detail-section">
+                                                <span class="detail-label text-red">Error:</span>
+                                                <span class="text-red">@log.ErrorMessage</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (_totalPages > 1)
+        {
+            <div class="pagination mono">
+                <button class="page-btn" disabled="@(_page <= 1)" @onclick="PrevPage">@L["Prev"]</button>
+                <span class="text-muted">@_page / @_totalPages</span>
+                <button class="page-btn" disabled="@(_page >= _totalPages)" @onclick="NextPage">@L["Next"]</button>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private AiLogsResult? _result;
+    private int _page = 1;
+    private const int PageSize = 20;
+    private Guid? _expandedId;
+    private int _totalPages => _result is null ? 1 : Math.Max(1, (int)Math.Ceiling(_result.TotalCount / (double)PageSize));
+
+    protected override async Task OnInitializedAsync() => await LoadLogs();
+
+    private async Task LoadLogs()
+    {
+        try { _result = await Mediator.Send(new GetAiLogsQuery(PageSize, _page)); }
+        catch { _result = new AiLogsResult([], 0, 0m); }
+    }
+
+    private async Task PrevPage() { _page = Math.Max(1, _page - 1); await LoadLogs(); }
+    private async Task NextPage() { _page = Math.Min(_totalPages, _page + 1); await LoadLogs(); }
+
+    private void ToggleExpand(Guid id) => _expandedId = _expandedId == id ? null : id;
+
+    private static string Truncate(string s, int max) =>
+        s.Length <= max ? s : s[..max] + "...";
+
+    private static string TruncateModel(string modelId)
+    {
+        var parts = modelId.Split('/');
+        return parts.Length > 1 ? parts[^1] : modelId;
+    }
+}

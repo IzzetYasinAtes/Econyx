@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddAiServices(config);
         services.AddSecretManagers(config);
         services.AddSingleton<IScanStatistics, ScanStatisticsTracker>();
+        services.AddSingleton<IAiRequestLogger, AiRequestLogger>();
 
         return services;
     }
@@ -89,6 +90,7 @@ public static class DependencyInjection
         services.AddScoped<IAiModelConfigurationRepository, AiModelConfigurationRepository>();
         services.AddScoped<IApiKeyConfigurationRepository, ApiKeyConfigurationRepository>();
         services.AddScoped<ITradingConfigurationRepository, TradingConfigurationRepository>();
+        services.AddScoped<IAiRequestLogRepository, AiRequestLogRepository>();
     }
 
     private static void AddPlatformAdapters(this IServiceCollection services, IConfiguration config)
@@ -144,7 +146,8 @@ public static class DependencyInjection
             new OpenRouterAnalysisService(
                 sp.GetRequiredService<AiResponseCache>(),
                 Microsoft.Extensions.Options.Options.Create(aiOptions),
-                sp.GetRequiredService<ILogger<OpenRouterAnalysisService>>()));
+                sp.GetRequiredService<ILogger<OpenRouterAnalysisService>>(),
+                sp.GetRequiredService<IAiRequestLogger>()));
 
         services.AddSingleton<IAiProviderFactory, AiProviderFactory>();
     }
