@@ -34,6 +34,7 @@ try
     builder.Services.AddHostedService<PositionMonitorService>();
     builder.Services.AddHostedService<BalanceTrackerService>();
     builder.Services.AddHostedService<HealthMonitorService>();
+    builder.Services.AddHostedService<LogCleanupService>();
 
     var host = builder.Build();
 

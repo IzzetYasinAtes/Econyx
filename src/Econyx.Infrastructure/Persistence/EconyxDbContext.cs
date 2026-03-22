@@ -22,6 +22,7 @@ public class EconyxDbContext : DbContext
     public DbSet<AiModelConfiguration> AiModelConfigurations => Set<AiModelConfiguration>();
     public DbSet<ApiKeyConfiguration> ApiKeyConfigurations => Set<ApiKeyConfiguration>();
     public DbSet<TradingConfiguration> TradingConfigurations => Set<TradingConfiguration>();
+    public DbSet<AiRequestLog> AiRequestLogs => Set<AiRequestLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

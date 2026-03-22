@@ -12,6 +12,7 @@ internal sealed partial class OpenRouterAnalysisService : IAiAnalysisService
 {
     private readonly AiResponseCache _cache;
     private readonly ILogger<OpenRouterAnalysisService> _logger;
+    private readonly IAiRequestLogger _requestLogger;
     private readonly string _baseUrl;
 
     private string _modelId = "anthropic/claude-sonnet-4-20250514";
@@ -23,10 +24,12 @@ internal sealed partial class OpenRouterAnalysisService : IAiAnalysisService
     public OpenRouterAnalysisService(
         AiResponseCache cache,
         IOptions<AiOptions> aiOptions,
-        ILogger<OpenRouterAnalysisService> logger)
+        ILogger<OpenRouterAnalysisService> logger,
+        IAiRequestLogger requestLogger)
     {
         _cache = cache;
         _logger = logger;
+        _requestLogger = requestLogger;
         _baseUrl = aiOptions.Value.OpenRouter.BaseUrl;
     }
 
@@ -47,6 +50,10 @@ internal sealed partial class OpenRouterAnalysisService : IAiAnalysisService
         if (_cache.TryGet<FairValueResult>(cacheKey, out var cached) && cached is not null)
         {
             LogCacheHit(_logger, request.Question);
+            await _requestLogger.LogAsync(
+                "OpenRouter", _modelId, request.Question, "", null,
+                cached.Reasoning, cached.Outcomes.Count > 0 ? cached.Outcomes[0].FairValue.Value : null, cached.Confidence,
+                0, 0, 0m, true, true, null, ct);
             return cached;
         }
 
@@ -86,6 +93,12 @@ internal sealed partial class OpenRouterAnalysisService : IAiAnalysisService
 
         var result = ParseResponse(responseText, cost);
         _cache.Set(cacheKey, result);
+
+        await _requestLogger.LogAsync(
+            "OpenRouter", _modelId, request.Question, prompt, responseText,
+            result.Reasoning, result.Outcomes.Count > 0 ? result.Outcomes[0].FairValue.Value : null, result.Confidence,
+            (int)inputTokens, (int)outputTokens, cost, true, false, null, ct);
+
         return result;
     }
 
