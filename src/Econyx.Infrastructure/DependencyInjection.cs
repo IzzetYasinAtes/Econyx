@@ -88,6 +88,7 @@ public static class DependencyInjection
         services.AddScoped<IBalanceSnapshotRepository, BalanceSnapshotRepository>();
         services.AddScoped<IAiModelConfigurationRepository, AiModelConfigurationRepository>();
         services.AddScoped<IApiKeyConfigurationRepository, ApiKeyConfigurationRepository>();
+        services.AddScoped<ITradingConfigurationRepository, TradingConfigurationRepository>();
     }
 
     private static void AddPlatformAdapters(this IServiceCollection services, IConfiguration config)

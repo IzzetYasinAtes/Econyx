@@ -31,10 +31,14 @@ public sealed class GetDashboardStatsHandler : IRequestHandler<GetDashboardStats
 
     public async Task<DashboardStatsDto> Handle(GetDashboardStatsQuery request, CancellationToken cancellationToken)
     {
-        var balance = await _platform.GetBalanceAsync(cancellationToken);
         var openPositions = await _positionRepository.FindAsync(p => p.IsOpen, cancellationToken);
         var allTrades = await _tradeRepository.GetAllAsync(cancellationToken);
         var snapshots = await _snapshotRepository.GetAllAsync(cancellationToken);
+
+        var latestSnapshot = snapshots.Count > 0
+            ? snapshots.OrderByDescending(s => s.CreatedAt).First()
+            : null;
+        var balance = latestSnapshot?.Balance ?? await _platform.GetBalanceAsync(cancellationToken);
 
         var (totalPnL, winRate) = TradeStatsCalculator.Calculate(allTrades);
 

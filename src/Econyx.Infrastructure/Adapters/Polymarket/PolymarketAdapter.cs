@@ -80,7 +80,7 @@ internal sealed partial class PolymarketAdapter : IPlatformAdapter
         return PolymarketMapper.ToOrderBook(tokenId, result.Data);
     }
 
-    public async Task<Probability> GetPriceAsync(string tokenId, CancellationToken ct = default)
+    public async Task<Probability?> GetPriceAsync(string tokenId, CancellationToken ct = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(tokenId);
 
@@ -88,7 +88,7 @@ internal sealed partial class PolymarketAdapter : IPlatformAdapter
         if (!result.Success)
         {
             LogPriceFailed(_logger, tokenId, result.Error?.ToString());
-            return Probability.Create(0.5m);
+            return null;
         }
 
         var price = Math.Clamp(result.Data.Price, 0m, 1m);

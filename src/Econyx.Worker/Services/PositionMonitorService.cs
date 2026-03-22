@@ -87,6 +87,12 @@ public sealed class PositionMonitorService : BackgroundService
         CancellationToken ct)
     {
         var currentProbability = await platform.GetPriceAsync(position.TokenId, ct);
+        if (currentProbability is null)
+        {
+            _logger.LogWarning("Price unavailable for {TokenId}, skipping position {Id}", position.TokenId, position.Id);
+            return;
+        }
+
         var currentPrice = Money.Create(currentProbability.Value);
         position.UpdatePrice(currentPrice);
 

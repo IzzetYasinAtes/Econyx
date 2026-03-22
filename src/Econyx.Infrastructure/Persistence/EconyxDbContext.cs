@@ -21,6 +21,7 @@ public class EconyxDbContext : DbContext
     public DbSet<BalanceSnapshot> BalanceSnapshots => Set<BalanceSnapshot>();
     public DbSet<AiModelConfiguration> AiModelConfigurations => Set<AiModelConfiguration>();
     public DbSet<ApiKeyConfiguration> ApiKeyConfigurations => Set<ApiKeyConfiguration>();
+    public DbSet<TradingConfiguration> TradingConfigurations => Set<TradingConfiguration>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

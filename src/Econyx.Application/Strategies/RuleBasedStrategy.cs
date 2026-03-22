@@ -38,7 +38,9 @@ public sealed class RuleBasedStrategy : IStrategy
             foreach (var outcome in market.Outcomes)
             {
                 var price = outcome.Price.Value;
-                StrategySignal? candidate = null;
+
+                if (price <= 0.03m || price >= 0.97m)
+                    continue;
 
                 if (price < 0.15m)
                 {
@@ -46,7 +48,7 @@ public sealed class RuleBasedStrategy : IStrategy
 
                     if (buyEdge >= _options.MinEdgeThreshold)
                     {
-                        candidate = new StrategySignal(
+                        var candidate = new StrategySignal(
                             market.Id,
                             market.Question,
                             outcome.Token.Value,
@@ -56,33 +58,44 @@ public sealed class RuleBasedStrategy : IStrategy
                             outcome.Price,
                             0.6m,
                             Name,
-                            $"Price {price:P1} below 15% threshold, potential value buy on '{outcome.Name}'");
+                            $"Price {price:P1} below 15% threshold, buying '{outcome.Name}' token");
+
+                        if (bestSignal is null || candidate.Edge.AbsoluteValue > bestSignal.Edge.AbsoluteValue)
+                            bestSignal = candidate;
                     }
                 }
                 else if (price > 0.85m)
                 {
-                    var sellEdge = price - 0.85m;
+                    var complementary = market.Outcomes.FirstOrDefault(o =>
+                        o.Token.Value != outcome.Token.Value);
 
-                    if (sellEdge >= _options.MinEdgeThreshold)
+                    if (complementary is null)
+                        continue;
+
+                    var compPrice = complementary.Price.Value;
+
+                    if (compPrice <= 0.03m || compPrice >= 0.97m)
+                        continue;
+
+                    var buyEdge = 0.15m - compPrice;
+
+                    if (buyEdge >= _options.MinEdgeThreshold)
                     {
-                        candidate = new StrategySignal(
+                        var candidate = new StrategySignal(
                             market.Id,
                             market.Question,
-                            outcome.Token.Value,
-                            TradeSide.No,
-                            Edge.Create(sellEdge),
-                            Probability.Create(0.85m),
-                            outcome.Price,
+                            complementary.Token.Value,
+                            TradeSide.Yes,
+                            Edge.Create(buyEdge),
+                            Probability.Create(0.15m),
+                            complementary.Price,
                             0.6m,
                             Name,
-                            $"Price {price:P1} above 85% threshold, potential fade on '{outcome.Name}'");
-                    }
-                }
+                            $"'{outcome.Name}' at {price:P1} overpriced, buying complementary '{complementary.Name}' token at {compPrice:P1}");
 
-                if (candidate is not null &&
-                    (bestSignal is null || candidate.Edge.AbsoluteValue > bestSignal.Edge.AbsoluteValue))
-                {
-                    bestSignal = candidate;
+                        if (bestSignal is null || candidate.Edge.AbsoluteValue > bestSignal.Edge.AbsoluteValue)
+                            bestSignal = candidate;
+                    }
                 }
             }
 

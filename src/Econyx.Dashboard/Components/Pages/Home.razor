@@ -59,7 +59,7 @@ else
                     <div class="chart-wrapper">
                         @if (_balanceHistory.Count > 0)
                         {
-                            <ApexChart TItem="BalanceHistoryPoint"
+                            <ApexChart @ref="_chart" TItem="BalanceHistoryPoint"
                                        Options="_chartOptions"
                                        Height="@("100%")"
                                        Width="@("100%")"
@@ -119,6 +119,7 @@ else
     private decimal _initialBalance = 50m;
     private List<ActivityLogEntry> _activityLog = [];
     private List<BalanceHistoryPoint> _balanceHistory = [];
+    private ApexChart<BalanceHistoryPoint>? _chart;
 
     private ApexChartOptions<BalanceHistoryPoint> _chartOptions = new()
     {
@@ -212,7 +213,15 @@ else
     private async Task RefreshStats()
     {
         await LoadStats();
-        await InvokeAsync(StateHasChanged);
+        await InvokeAsync(async () =>
+        {
+            StateHasChanged();
+            if (_chart is not null)
+            {
+                try { await _chart.UpdateSeriesAsync(true); }
+                catch { /* chart henüz render edilmemiş olabilir */ }
+            }
+        });
     }
 
     private static string FormatMoney(Money m) => $"${m.Amount:F2}";

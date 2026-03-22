@@ -66,14 +66,18 @@ public sealed class RuleBasedStrategyTests
     }
 
     [Fact]
-    public async Task EvaluateAsync_ShouldGenerateSellSignal_WhenPriceAbove85Percent()
+    public async Task EvaluateAsync_ShouldBuyComplementaryToken_WhenPriceAbove85Percent()
     {
         var market = CreateMarket(yesPrice: 0.95m);
         var strategy = CreateStrategy();
 
         var signals = await strategy.EvaluateAsync([market]);
 
-        signals.Should().Contain(s => s.RecommendedSide == TradeSide.No);
+        // Yes at 0.95 → buy complementary No token at 0.05
+        signals.Should().ContainSingle();
+        signals[0].TokenId.Should().Be("tok-no");
+        signals[0].RecommendedSide.Should().Be(TradeSide.Yes);
+        signals[0].MarketPrice.Value.Should().Be(0.05m);
     }
 
     [Fact]
@@ -144,8 +148,10 @@ public sealed class RuleBasedStrategyTests
 
         var signals = await strategy.EvaluateAsync(markets);
 
-        signals.Should().HaveCountGreaterThanOrEqualTo(2);
-        signals.Should().Contain(s => s.RecommendedSide == TradeSide.Yes);
-        signals.Should().Contain(s => s.RecommendedSide == TradeSide.No);
+        // Market 1: Yes at 0.05 → buy Yes token
+        // Market 2: Yes at 0.50 → no signal (middle range)
+        // Market 3: Yes at 0.95 → buy complementary No token
+        signals.Should().HaveCount(2);
+        signals.Should().OnlyContain(s => s.RecommendedSide == TradeSide.Yes);
     }
 }

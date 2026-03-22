@@ -38,11 +38,17 @@ public sealed class TakeSnapshotHandler : IRequestHandler<TakeSnapshotCommand, R
 
     public async Task<Result<Guid>> Handle(TakeSnapshotCommand request, CancellationToken cancellationToken)
     {
-        var balance = await _platform.GetBalanceAsync(cancellationToken);
+        var cashBalance = await _platform.GetBalanceAsync(cancellationToken);
         var openPositions = await _positionRepository.FindAsync(p => p.IsOpen, cancellationToken);
         var allTrades = await _tradeRepository.GetAllAsync(cancellationToken);
 
         var (totalPnL, winRate) = TradeStatsCalculator.Calculate(allTrades);
+
+        var openPositionsValue = 0m;
+        foreach (var pos in openPositions)
+            openPositionsValue += pos.CurrentPrice.Amount * pos.Quantity;
+
+        var totalPortfolio = Money.Create(cashBalance.Amount + openPositionsValue);
 
         var initialBalance = Money.Create(_options.InitialBalance);
         var totalPnLPercent = initialBalance.Amount > 0
@@ -50,7 +56,7 @@ public sealed class TakeSnapshotHandler : IRequestHandler<TakeSnapshotCommand, R
             : 0m;
 
         var snapshot = BalanceSnapshot.Create(
-            balance,
+            totalPortfolio,
             totalPnL,
             totalPnLPercent,
             openPositions.Count,
