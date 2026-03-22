@@ -102,6 +102,11 @@ public sealed class PositionMonitorService : BackgroundService
         if (entryAmount <= 0)
             return;
 
+
+        var holdDuration = DateTime.UtcNow - position.CreatedAt;
+        if (holdDuration.TotalMinutes < _tradingOptions.MinHoldMinutes)
+            return;
+
         var pnlPercent = (pnl.Amount / entryAmount) * 100m;
 
         if (pnlPercent <= -_tradingOptions.StopLossPercent)

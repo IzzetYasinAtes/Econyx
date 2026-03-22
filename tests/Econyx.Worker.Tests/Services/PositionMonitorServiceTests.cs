@@ -25,7 +25,8 @@ public sealed class PositionMonitorServiceTests
     private readonly TradingOptions _options = new()
     {
         StopLossPercent = 50m,
-        TakeProfitPercent = 100m
+        TakeProfitPercent = 100m,
+        MinHoldMinutes = 0
     };
 
     private PositionMonitorService CreateService()

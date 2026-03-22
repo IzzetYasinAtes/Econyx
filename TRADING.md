@@ -178,7 +178,7 @@ positionSize = balance * max(cappedFraction, 0)
 
 1. **Calculate odds:** Convert probability to decimal odds. If fairValue = 0.55, then odds = (1/0.55) - 1 = 0.818
 2. **Kelly fraction:** Divide edge by odds. If edge = 0.23 and odds = 0.818, then kelly = 0.23 / 0.818 = 0.281 (28.1%)
-3. **Cap it:** Apply `MaxPositionSizePercent` (default 5%) as upper limit. So capped = min(0.281, 0.05) = 0.05
+3. **Cap it:** Apply `MaxPositionSizePercent` (default 2%) as upper limit. So capped = min(0.281, 0.02) = 0.02
 4. **Position size:** Multiply by balance. If balance = $1000, then position = $1000 * 0.05 = $50
 
 ### Why Kelly?
@@ -258,8 +258,8 @@ pnlPercent = (pnl / entryAmount) * 100
 
 | Condition | Action | Default |
 |-----------|--------|---------|
-| `pnlPercent <= -StopLossPercent` | Close position (stop loss) | -15% |
-| `pnlPercent >= TakeProfitPercent` | Close position (take profit) | +25% |
+| `pnlPercent <= -StopLossPercent` | Close position (stop loss) | -30% |
+| `pnlPercent >= TakeProfitPercent` | Close position (take profit) | +50% |
 
 ### PnL Calculation
 
@@ -277,7 +277,7 @@ PnL depends on the trade direction:
 - PnL = (0.55 - 0.30) * 166.67 = $41.67
 - Entry amount = 0.30 * 166.67 = $50.00
 - PnL% = (41.67 / 50.00) * 100 = +83.3%
-- TakeProfitPercent = 25% → **Take profit triggered**, position closes
+- TakeProfitPercent = 50% → **Take profit triggered**, position closes
 
 ---
 
@@ -376,12 +376,12 @@ To reduce API costs, responses are cached for `CacheDurationMinutes` (default: 3
 | `InitialBalance` | $50 | Starting paper balance |
 | `ScanIntervalMinutes` | 5 | How often to scan markets |
 | `MaxOpenPositions` | 10 | Maximum simultaneous positions |
-| `MaxPositionSizePercent` | 5% | Kelly cap — max % of balance per trade |
+| `MaxPositionSizePercent` | 2% | Kelly cap — max % of balance per trade |
 | `MinEdgeThreshold` | 0.06 | Minimum edge required (6%) |
 | `MinVolumeUsd` | $5,000 | Minimum 24h volume filter |
 | `MaxSpreadCents` | 5 | Maximum bid-ask spread (cents) |
-| `StopLossPercent` | 15% | Close if loss exceeds this |
-| `TakeProfitPercent` | 25% | Close if profit exceeds this |
+| `StopLossPercent` | 30% | Close if loss exceeds this |
+| `TakeProfitPercent` | 50% | Close if profit exceeds this |
 | `SurvivalModeThresholdUsd` | $10 | Reduce activity below this balance |
 
 ---
@@ -744,8 +744,8 @@ pnlYuzde = (pnl / girisUcreti) * 100
 
 | Kosul | Aksiyon | Varsayilan |
 |-------|---------|-----------|
-| `pnlYuzde <= -StopLossPercent` | Pozisyonu kapat (zarar durdur) | -%15 |
-| `pnlYuzde >= TakeProfitPercent` | Pozisyonu kapat (kar al) | +%25 |
+| `pnlYuzde <= -StopLossPercent` | Pozisyonu kapat (zarar durdur) | -%30 |
+| `pnlYuzde >= TakeProfitPercent` | Pozisyonu kapat (kar al) | +%50 |
 
 ### Kar/Zarar Hesaplama
 
@@ -763,7 +763,7 @@ Kar/zarar islem yonune baglidir:
 - PnL = (0.55 - 0.30) * 166.67 = $41.67
 - Giris tutari = 0.30 * 166.67 = $50.00
 - PnL% = (41.67 / 50.00) * 100 = +%83.3
-- TakeProfitPercent = %25 → Fiyat ~$0.10'a ulastiginda **kar al tetiklendi**, pozisyon kapandi
+- TakeProfitPercent = %50 → Fiyat ~$0.10'a ulastiginda **kar al tetiklendi**, pozisyon kapandi
 
 ---
 
@@ -842,8 +842,8 @@ API maliyetlerini azaltmak icin yanitlar `CacheDurationMinutes` (varsayilan: 30 
 | `MinEdgeThreshold` | 0.06 | Gereken minimum edge (%6) |
 | `MinVolumeUsd` | $5,000 | Minimum 24s hacim filtresi |
 | `MaxSpreadCents` | 5 | Maks alim-satim farki (sent) |
-| `StopLossPercent` | %15 | Zarar bunu asarsa kapat |
-| `TakeProfitPercent` | %25 | Kar bunu asarsa kapat |
+| `StopLossPercent` | %30 | Zarar bunu asarsa kapat |
+| `TakeProfitPercent` | %50 | Kar bunu asarsa kapat |
 | `SurvivalModeThresholdUsd` | $10 | Bu bakiyenin altinda aktiviteyi azalt |
 
 ---

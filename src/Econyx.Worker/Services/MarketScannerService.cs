@@ -102,6 +102,8 @@ public sealed class MarketScannerService : BackgroundService
 
         var signalsToProcess = scanResult.Signals
             .Where(s => !existingMarketIds.Contains(s.MarketId))
+            .GroupBy(s => s.MarketId)
+            .Select(g => g.OrderByDescending(s => s.Edge.AbsoluteValue).First())
             .Take(availableSlots);
 
         foreach (var signal in signalsToProcess)

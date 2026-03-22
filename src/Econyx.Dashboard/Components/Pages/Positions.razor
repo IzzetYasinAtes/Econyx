@@ -28,6 +28,7 @@ else
                     <th>@L["Trades_Entry"]</th>
                     <th>@L["Positions_Current"]</th>
                     <th>@L["Trades_Qty"]</th>
+                    <th>Cost</th>
                     <th>@L["Trades_PnL"]</th>
                     <th>@L["Trades_Strategy"]</th>
                     <th>@L["Positions_Opened"]</th>
@@ -43,9 +44,10 @@ else
                                 @p.Side
                             </span>
                         </td>
-                        <td class="mono">$@p.EntryPrice.Amount.ToString("F2")</td>
-                        <td class="mono">$@p.CurrentPrice.Amount.ToString("F2")</td>
-                        <td class="mono">@p.Quantity.ToString("F2")</td>
+                        <td class="mono">$@p.EntryPrice.Amount.ToString("F4")</td>
+                        <td class="mono">$@p.CurrentPrice.Amount.ToString("F4")</td>
+                        <td class="mono">@p.Quantity.ToString("N0")</td>
+                        <td class="mono">$@((p.EntryPrice.Amount * p.Quantity).ToString("F2"))</td>
                         <td class="mono @PnLClass(p.UnrealizedPnL.Amount)">
                             @FormatPnL(p.UnrealizedPnL.Amount)
                         </td>
