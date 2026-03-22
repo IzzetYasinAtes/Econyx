@@ -36,7 +36,7 @@ internal sealed partial class PaperTradingAdapter : IPlatformAdapter, IDisposabl
     public Task<MarketOrderBook> GetOrderBookAsync(string tokenId, CancellationToken ct = default)
         => _dataSource.GetOrderBookAsync(tokenId, ct);
 
-    public Task<Probability> GetPriceAsync(string tokenId, CancellationToken ct = default)
+    public Task<Probability?> GetPriceAsync(string tokenId, CancellationToken ct = default)
         => _dataSource.GetPriceAsync(tokenId, ct);
 
     public async Task<Money> GetBalanceAsync(CancellationToken ct = default)

@@ -65,6 +65,11 @@ public sealed class TradeExecutorService : BackgroundService
                 if (order.Mode == TradingMode.Live && !string.IsNullOrEmpty(order.PlatformOrderId))
                 {
                     var currentPrice = await platform.GetPriceAsync(order.TokenId, ct);
+                    if (currentPrice is null)
+                    {
+                        _logger.LogWarning("Price unavailable for order {OrderId}, skipping", order.Id);
+                        continue;
+                    }
                     order.Fill(Money.Create(currentPrice.Value), order.Quantity);
 
                     _logger.LogInformation(

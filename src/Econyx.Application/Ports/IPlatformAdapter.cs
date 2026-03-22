@@ -9,7 +9,7 @@ public interface IPlatformAdapter
     PlatformType Platform { get; }
     Task<IReadOnlyList<Market>> GetMarketsAsync(CancellationToken ct = default);
     Task<MarketOrderBook> GetOrderBookAsync(string tokenId, CancellationToken ct = default);
-    Task<Probability> GetPriceAsync(string tokenId, CancellationToken ct = default);
+    Task<Probability?> GetPriceAsync(string tokenId, CancellationToken ct = default);
     Task<Money> GetBalanceAsync(CancellationToken ct = default);
     Task<string> PlaceOrderAsync(PlaceOrderRequest request, CancellationToken ct = default);
     Task CancelOrderAsync(string platformOrderId, CancellationToken ct = default);
